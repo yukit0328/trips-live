@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>名古屋・上田・横浜 旅のしおり</title>
+<style>
+:root{
+  --ink:#17212b;--muted:#5b6875;--line:#d9e0e6;--paper:#fff;--bg:#f3f6f8;
+  --accent:#245a73;--accent2:#1c7c54;--soft:#eaf2f5;--warn-bg:#fff8e8;--warn:#c48a1a;
+  --alert-bg:#fff0ee;--alert:#bd5146;--ok-bg:#ecf7f1;--ok:#1c7c54;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;line-height:1.65;font-size:15px}
+main{max-width:860px;margin:auto;background:var(--paper);padding:16px 16px 96px}
+section{scroll-margin-top:12px}
+h1{font-size:clamp(24px,6.5vw,38px);line-height:1.25;margin:.2em 0}
+h2{font-size:21px;border-bottom:3px solid var(--accent);padding-bottom:6px;margin:1.8em 0 .7em}
+h3{font-size:17px;margin:1.4em 0 .5em;padding-left:10px;border-left:4px solid var(--accent)}
+p{margin:.4em 0 .8em}
+a{color:#145c83;overflow-wrap:anywhere}
+.lead{color:var(--muted);font-size:15px}
+.small{font-size:12.5px;color:var(--muted)}
+.hero{padding:20px 18px;border-radius:16px;background:linear-gradient(135deg,#dfecf1,#f7f9fa);margin-bottom:14px}
+.kicker{color:var(--accent);font-weight:700;letter-spacing:.06em;font-size:12px}
+.pill{display:inline-block;background:#fff;border:1px solid #c9d8e0;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;color:var(--accent);margin:2px 4px 2px 0}
+.badge{display:inline-block;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;vertical-align:middle;margin-left:4px}
+.b-fix{background:var(--ok-bg);color:var(--ok);border:1px solid #b9e0cb}
+.b-cand{background:var(--soft);color:var(--accent);border:1px solid #c9d8e0}
+.b-chk{background:var(--warn-bg);color:#8a5d00;border:1px solid #efd59a}
+.b-rec{background:#245a73;color:#fff}
+.note{background:var(--warn-bg);border-left:4px solid var(--warn);padding:11px 13px;border-radius:8px;margin:12px 0}
+.alert{background:var(--alert-bg);border-left:4px solid var(--alert);padding:12px 14px;border-radius:8px;margin:12px 0}
+.okbox{background:var(--ok-bg);border-left:4px solid var(--ok);padding:11px 13px;border-radius:8px;margin:12px 0}
+.toc{border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0 18px;background:#fbfcfd}
+.toc strong{display:block;margin-bottom:8px}
+.toc ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toc a{display:flex;align-items:center;min-height:46px;padding:8px 10px;border-radius:10px;background:#fff;border:1px solid var(--line);text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+.toc a span{color:var(--accent);margin-right:6px;font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 14px}
+th,td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:left;vertical-align:top}
+th{background:#f0f4f6;font-size:13px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* timeline */
+.tl{list-style:none;margin:8px 0 16px;padding:0}
+.tl li{position:relative;padding:10px 0 12px 74px;border-bottom:1px dashed var(--line)}
+.tl .t{position:absolute;left:0;top:10px;width:66px;font-weight:800;color:var(--accent);font-size:14px;line-height:1.3}
+.tl .ttl{font-weight:800;font-size:15.5px}
+.tl .m{font-size:13.5px;color:var(--muted);margin:2px 0 6px}
+.tl li.key .ttl{color:var(--alert)}
+.tl li.drive .t::after{content:"🚗";display:block;font-size:13px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:40px;padding:7px 12px;border-radius:10px;border:1px solid #b8c9d2;background:#fff;color:#14506b;text-decoration:none;font-size:13px;font-weight:700;line-height:1.2}
+.btn.cal{border-color:#9bc7ae;color:#14633f;background:#f4fbf7}
+.btn.route{background:#245a73;color:#fff;border-color:#245a73}
+.btn.na{background:#f2f2f2;color:#777;border-color:#ddd;cursor:default}
+.btn:active{transform:scale(.98)}
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:8px 0 14px}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.card .ph{position:relative;height:150px;background:#e7ecef}
+.card .ph img{width:100%;height:150px;object-fit:cover;display:block}
+.card .ph .cap{position:absolute;left:0;bottom:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:3px 8px}
+.card .noph{height:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;background:repeating-linear-gradient(45deg,#f1f4f6,#f1f4f6 8px,#e9eef1 8px,#e9eef1 16px);color:#6b7a86;font-size:12px;text-align:center;padding:6px}
+.card .body{padding:12px;flex:1;display:flex;flex-direction:column}
+.card .name{font-weight:800;font-size:15.5px;margin-bottom:2px}
+.card dl{margin:6px 0;font-size:13px;display:grid;grid-template-columns:4.6em 1fr;gap:2px 6px}
+.card dt{color:var(--muted)}
+.card dd{margin:0}
+.card p{font-size:13.5px;margin:4px 0 6px}
+.card .btns{margin-top:auto;padding-top:6px}
+.card.rec{border:2px solid var(--accent)}
+/* checklist */
+.cl{list-style:none;margin:6px 0;padding:0}
+.cl li{display:flex;align-items:flex-start;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14.5px}
+.cl input{width:24px;height:24px;flex:0 0 24px;margin:0;accent-color:var(--accent2)}
+.cl label{flex:1;cursor:pointer}
+.done-wrap{margin-top:8px;border:1px dashed #b9e0cb;border-radius:10px;padding:6px 10px;background:#f8fcfa}
+.done-wrap summary{cursor:pointer;font-weight:700;color:var(--ok);font-size:13.5px;padding:6px 0}
+.done-wrap .cl li label{color:#7a8a94;text-decoration:line-through}
+.cl .sub-items{margin:4px 0 0;padding-left:1.1em;font-size:13.5px;color:var(--muted)}
+.cl .sub-items li{display:list-item;border:0;padding:1px 0;font-size:13.5px}
+.grp{font-weight:800;margin:14px 0 2px;font-size:14.5px;color:var(--accent)}
+/* map */
+.gmap{position:relative;width:100%;height:380px;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin:8px 0;background:#eef2f4}
+.gmap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.mapfallback{display:none;padding:14px;background:#f5f8fa;border:1px solid var(--line);border-radius:12px}
+.legend{list-style:none;padding:0;margin:6px 0;display:grid;gap:4px;font-size:13.5px}
+.legend li span{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:12px;align-items:center;justify-content:center;margin-right:6px}
+.num-icon{background:var(--accent);color:#fff;border:2px solid #fff;border-radius:50%;width:26px!important;height:26px!important;display:flex!important;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+/* calculator */
+.calc{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcfd}
+.calc input[type=time]{font-size:18px;padding:8px;border-radius:8px;border:1px solid #b8c9d2;min-height:44px}
+.calc table td:first-child{white-space:nowrap}
+.verdict-ok{color:var(--ok);font-weight:800}
+.verdict-ng{color:var(--alert);font-weight:800}
+.verdict-mid{color:#8a5d00;font-weight:800}
+/* bottom nav */
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.bnav a{flex:1;text-align:center;text-decoration:none;color:var(--accent);font-weight:800;font-size:12px;padding:8px 2px;min-height:44px;border-radius:8px}
+.bnav a:active{background:var(--soft)}
+.plan-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 4px;position:sticky;top:0;z-index:5;background:var(--paper);padding:6px 0}
+.ptab{min-height:54px;border:2px solid var(--accent);border-radius:12px;background:#fff;color:var(--accent);font-weight:800;font-size:15px;line-height:1.25;cursor:pointer;font-family:inherit}
+.ptab span{display:block;font-size:12px;font-weight:700}
+.ptab[aria-selected="true"]{background:var(--accent);color:#fff}
+.plan-panel{scroll-margin-top:72px}
+table.cmp td:first-child{white-space:nowrap;color:var(--muted);font-size:13px}
+table.cmp th a{color:inherit}
+.rec-pts{background:var(--ok-bg);border-radius:10px;padding:8px 10px 6px;margin:6px 0 4px}
+.rec-h{font-size:12px;font-weight:800;color:var(--ok);letter-spacing:.04em}
+.rec-pts ul{margin:3px 0 0;padding-left:1.15em;font-size:13.5px}
+.rec-pts li{margin:2px 0}
+.src li{font-size:12.5px;margin:4px 0}
+footer{border-top:1px solid var(--line);margin-top:28px;padding-top:12px;color:var(--muted);font-size:12px}
+@media (min-width:700px){main{padding:28px 32px 100px}}
+.sub{scroll-margin-top:12px}
+details.cands{border:1px solid var(--line);border-radius:12px;margin:12px 0;background:#fbfcfd;scroll-margin-top:12px}
+details.cands>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:48px;padding:10px 14px;font-weight:800;font-size:15px;color:var(--accent)}
+details.cands>summary::-webkit-details-marker{display:none}
+details.cands>summary .sum-h{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+details.cands>summary .sum-h::after{content:" ▼"}
+details.cands[open]>summary .sum-h{visibility:hidden}
+details.cands[open]>summary{border-bottom:1px solid var(--line)}
+details.cands>*:not(summary){margin-left:10px;margin-right:10px}
+details.cands>.grid{margin-bottom:12px}
+@media (min-width:700px){.toc ol{grid-template-columns:repeat(3,1fr)}}
+
+@media print{.bnav{display:none}body{background:#fff}main{padding:10mm}.card{break-inside:avoid}}
+</style>
+<script>
+function imgFail(el){
+  var ph=el.parentNode; if(!ph) return;
+  var d=document.createElement('div'); d.className='noph';
+  d.innerHTML='この画面では写真を表示できません<br><span style="font-size:11px">Safari・Chromeなどのブラウザで開くと表示されます</span>';
+  ph.parentNode.replaceChild(d,ph);
+}
+</script>
+</head>
+<body>
+<main>
+
+<!-- ===== タイトル ===== -->
+<header class="hero" id="top">
+  <div class="kicker">ROAD TRIP BOOKLET · 2026.11.1–11.3 · 2泊3日</div>
+  <h1>名古屋・上田・横浜<br>3日間の旅</h1>
+  <p class="lead">2026年11月1日（日）〜11月3日（火・祝）</p>
+  <p><span class="pill">名古屋めし</span><span class="pill">大須散策</span><span class="pill">KIWAMI SAUNA</span><span class="pill">Earthboat 薪サウナ</span><span class="pill">Kvi Baba LIVE</span></p>
+</header>
+
+<!-- ===== 目次 ===== -->
+<nav class="toc" aria-label="目次">
+  <strong>目次</strong>
+  <ol>
+    <li><a href="#overview"><span>1</span>旅行概要・ルート</a></li>
+    <li><a href="#prep"><span>2</span>出発前にやること</a></li>
+    <li><a href="#day1"><span>3</span>DAY 1：名古屋</a></li>
+    <li><a href="#day2"><span>4</span>DAY 2：上田</a></li>
+    <li><a href="#day3"><span>5</span>DAY 3：横浜・東京</a></li>
+    <li><a href="#info"><span>6</span>実用情報・参考リンク</a></li>
+  </ol>
+</nav>
+
+<div class="alert"><strong>最重要（11/3）：</strong>Kアリーナ横浜へ<strong>13:00までに到着（絶対）</strong>、目標は12:00〜12:30。Earthboatを<strong>06:00に出発</strong>すれば、休憩2回・祝日の渋滞・入庫を見込んでも到着は11:15〜12:00の見込み（<a href="#d3-check">検証の詳細</a>）。駐車場は<strong>出発前に必ず確保</strong>。</div>
+
+<!-- ===== 旅行概要 ===== -->
+<section id="overview">
+<h2>1. 旅行概要</h2>
+<div class="scroll"><table>
+<tr><th>日程</th><th>主な行程</th><th>宿泊</th></tr>
+<tr><td><strong>11/1（日）</strong></td><td>02:00 東京発 → KIWAMI SAUNA 大須 → 大須散策・昼食 → 熱田神宮 → ホテル（仮眠・サウナ）→ 名古屋めし</td><td>ザ ロイヤルパークホテル アイコニック 名古屋 <span class="badge b-fix">予約済</span></td></tr>
+<tr><td><strong>11/2（月）</strong></td><td><strong>A：</strong>諏訪大社 下社秋宮 → ツルヤ 稲荷山店 → Earthboat<br><strong>B：</strong>直行 → ツルヤ 稲荷山店 → Earthboat<br>どちらも15:15ごろ着。サウナ・温泉・BBQ</td><td>Earthboat Ueda Onsen <span class="badge b-fix">予約済</span></td></tr>
+<tr><td><strong>11/3（火・祝）</strong></td><td>06:00 上田発 → 横浜（目標12:00〜12:30）→ Kvi Baba LIVE（開場15:30／開演17:00）→ 温泉・サウナ 約2時間 → 東京</td><td>帰宅（翌日仕事）</td></tr>
+</table></div>
+
+<h3>ルート</h3>
+<p><strong>①東京 → ②名古屋 → ③Earthboat（上田） → ④Kアリーナ横浜 → ⑤東京</strong></p>
+<div class="btns"><a class="btn route" id="fullRoute2" target="_blank" rel="noopener">🗺 全行程をGoogleマップで開く</a><a class="btn" href="#routemap">地図で位置を見る</a></div>
+<div id="routemap" class="sub">
+<h3>全体ルートマップ</h3>
+<p class="small">Googleマップで、訪問順（①〜⑥）どおりの実際の車のルートを表示しています。所要時間は渋滞を含まない目安です。</p>
+<div class="gmap"><iframe src="https://maps.google.com/maps?saddr=%E6%9D%B1%E4%BA%AC%E9%A7%85&amp;daddr=%E4%B8%AD%E6%97%A5%E3%83%93%E3%83%AB%20%E5%90%8D%E5%8F%A4%E5%B1%8B+to:Earthboat%20Ueda%20Onsen+to:K%E3%82%A2%E3%83%AA%E3%83%BC%E3%83%8A%E6%A8%AA%E6%B5%9C+to:%E6%9D%B1%E4%BA%AC%E9%A7%85&amp;output=embed&amp;hl=ja" title="全行程のルート（Googleマップ）" allowfullscreen></iframe></div>
+<p class="small">地図が表示されない場合は、下の「Googleマップで全行程を開く」を使ってください。</p>
+<ol class="legend">
+  <li><span>1</span>東京（11/1 02:00 出発）</li>
+  <li><span>2</span>名古屋（大須・熱田神宮・ホテル／11/1泊）</li>
+  <li><span>3</span>Earthboat Ueda Onsen（上田／11/2泊）</li>
+  <li><span>4</span>Kアリーナ横浜（11/3 ライブ）</li>
+  <li><span>5</span>東京（11/3 夜、帰着）</li>
+</ol>
+<div class="btns">
+  <a class="btn route" id="fullRoute" target="_blank" rel="noopener">🗺 Googleマップで全行程を開く</a>
+</div>
+<div class="btns" style="margin-top:8px">
+  <a class="btn" data-leg="東京駅|KIWAMI SAUNA 大須 名古屋市中区橘1-4-12">DAY1 東京→名古屋</a>
+  <a class="btn" data-leg="ザ ロイヤルパークホテル アイコニック 名古屋|諏訪大社 下社秋宮 長野県諏訪郡下諏訪町5828|ツルヤ 稲荷山店 千曲市稲荷山1332|Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">DAY2 A（諏訪大社経由）</a><a class="btn" data-leg="ザ ロイヤルパークホテル アイコニック 名古屋|ツルヤ 稲荷山店 千曲市稲荷山1332|Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">DAY2 B（直行）</a>
+  <a class="btn" data-leg="Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183|Kアリーナ横浜 横浜市西区みなとみらい6-2-14">DAY3 上田→横浜</a>
+  <a class="btn" data-leg="Kアリーナ横浜|東京駅">帰路 横浜→東京</a>
+</div>
+</div>
+
+<h3>宿泊先（確定）</h3>
+<div class="grid">
+  <div class="card">
+    <div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.royalparkhotels.co.jp/ic/nagoya/assets/images/common/ogimage_ic_nagoyasakae.jpg" alt="ホテル公式サイトの画像" onerror="imgFail(this)"><div class="cap">出典：ホテル公式サイト</div></div>
+    <div class="body">
+      <div class="name">ザ ロイヤルパークホテル アイコニック 名古屋 <span class="badge b-fix">予約済</span></div>
+      <dl>
+        <dt>住所</dt><dd>名古屋市中区栄4-1-1 中日ビル（ロビー24F）</dd>
+        <dt>IN/OUT</dt><dd>15:00 ／ 11:00（予約内容）</dd>
+        <dt>駐車場</dt><dd>中日ビル地下駐車場（B3、ホテル直通エレベーターあり）。宿泊者は入庫から24時間で1,800円（到着時にフロントで駐車券を提示）。先着順・予約不可。<strong>入出庫 7:00〜24:00</strong>（時間外はホテルへ連絡）。滞在中の再入出庫はフロントで手続き。全長5,000／全幅2,000／全高2,300mm以内（車のサイズ適合確認済）。満車時はアートパーク東海駐車場の20時間券（2,000円・フロント販売）も可</dd>
+        <dt>サウナ</dt><dd>25F・宿泊者専用・無料。6:00〜12:00／15:00〜25:00。ドライサウナ・水風呂・休憩スペース。パジャマ・スリッパのまま利用可</dd>
+        <dt>設備</dt><dd>26Fジム（24時間・無料）、26Fコインランドリー、25F製氷機・自販機。24F 中国飯店 BAR 蒼（18:00〜23:00、LO22:30 ※引継ぎ情報）</dd>
+        <dt>備え付け</dt><dd>公式サイトに記載なし。予約サイトの掲載ではタオル、シャンプー類、歯ブラシ、カミソリ、ヘアブラシ、ドライヤー、ナイトウェア</dd>
+        <dt>注意</dt><dd>0:00〜5:00は入口の自動ドアがロック（カードキーかインターホン）。門限なし</dd>
+      </dl>
+      <div class="btns">
+        <a class="btn route" data-dest="ザ ロイヤルパークホテル アイコニック 名古屋 中日ビル">🚗 ここへのルート</a>
+        <a class="btn" href="https://www.royalparkhotels.co.jp/ic/nagoya/" target="_blank" rel="noopener">🌐 公式ページ</a>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://cdn-eb.prod.earthboat.jp/public/earthboat/ogp/ogp_ueda.webp" alt="Earthboat Ueda Onsen" onerror="imgFail(this)"><div class="cap">出典：Earthboat 公式サイト</div></div>
+    <div class="body">
+      <div class="name">Earthboat Ueda Onsen <span class="badge b-fix">予約済</span></div>
+      <dl>
+        <dt>住所</dt><dd>長野県上田市真田町傍陽9097-183（地蔵峠付近・標高約1,000m、十福の湯に隣接）</dd>
+        <dt>IN/OUT</dt><dd>15:00 ／ 10:00</dd>
+        <dt>アクセス</dt><dd>上信越道 上田菅平ICから車で約25分</dd>
+        <dt>設備</dt><dd>プライベート薪サウナ（水風呂・外気浴スペース付き）、温泉露天、BBQグリル・焚き火台（薪1泊分あり）、キッチン、冷蔵庫、敷地内に無人販売あり</dd>
+        <dt>備え付け</dt><dd>タオル（バス・フェイス）、シャンプー、コンディショナー、ボディソープ、歯ブラシ、ドライヤー／サウナ用の外用サンダル・水着・ポンチョ・アロマオイル／調理器具・食器・コーヒー豆と抽出器具／塩・胡椒・オリーブオイル</dd>
+        <dt>なし</dt><dd><strong>パジャマ、スキンケア用品、食材・飲み物・調味料</strong>（持ち込み）</dd>
+      </dl>
+      <p class="small">備え付けは公式サイトのQ&amp;Aより。</p>
+      <div class="btns">
+        <a class="btn route" data-dest="Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">🚗 ここへのルート</a>
+        <a class="btn" href="https://earthboat.jp/ueda_onsen" target="_blank" rel="noopener">🌐 公式ページ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>運転と安全のルール（全日共通）</h3>
+<div class="okbox">
+<ul style="margin:0;padding-left:1.2em">
+<li><strong>眠気・疲労を感じたら、予定より休憩・仮眠を優先</strong>。最寄りのSA/PAで15〜20分の仮眠を取る。時間を取り戻すための休憩カットはしない。</li>
+<li>運転は<strong>1〜1.5時間ごとに交代</strong>が目安。助手席の人は、運転しない時間にしっかり寝る。</li>
+<li>次に運転する予定の人は飲酒しない（前夜の深酒も避ける）。</li>
+<li>11/1は深夜2時発。<strong>10/31夜は早めに寝て、出発前に仮眠</strong>を取っておく。</li>
+</ul>
+</div>
+</section>
+
+
+
+<!-- ===== 出発前にやること ===== -->
+<section id="prep">
+<h2>2. 出発前にやること</h2>
+<details class="cands" id="todo"><summary><span class="sum-t">要確認・これから決めること</span><span class="sum-h">タップで開く</span></summary><div class="note">優先度が高い順：<strong>① Kアリーナ周辺の駐車場確保（今日中）</strong>、② Earthboatの早朝退出方法（公式LINE等で問い合わせ）、③ KIWAMI周辺の駐車場。</div>
+<div class="checklist" data-list="todo">
+  <ul class="cl" data-group="未完了">
+    <li data-id="t7">Kアリーナ周辺の駐車場の確保（P1予約 → 無理なら akippa・特P）</li>
+    <li data-id="t9">Earthboatの早朝チェックアウト・鍵返却方法（<a href="https://page.line.me/201iecbd?oat_content=url&openQrModal=true" target="_blank" rel="noopener">Earthboat公式LINE</a>）</li>
+    <li data-id="t1">KIWAMI SAUNA周辺のコインパーキング（最大料金あり・平置き）</li>
+    <li data-id="t2">大須の昼食候補の決定</li>
+    <li data-id="t3">名古屋の夕食候補の決定</li>
+    <li data-id="t4">DAY 2のモーニング喫茶店の決定</li>
+    <li data-id="t5">上田での買い出し先・順番の決定</li>
+    <li data-id="t8">ライブ後に利用する温泉施設の決定</li>
+    <li data-id="t8b">温泉施設の営業時間・最終入館時刻（当日公式で再確認）</li>
+    <li data-id="t10">11月3日の帰路・休憩計画の最終確認（前夜と当朝に渋滞予測を確認）</li>
+    <li data-id="t11">ライブ会場の持ち込み規定（主催者の案内で確認）</li>
+    <li data-id="t12">車の燃料・基本点検</li>
+    <li data-id="t13">前夜にスマホ・モバイルバッテリーを充電</li>
+  </ul>
+  <details class="done-wrap" open><summary>✅ 完了した項目（<span class="dcount">0</span>）</summary><ul class="cl done"></ul></details>
+</div>
+<p class="small">確認済みのため対象外：KIWAMI SAUNAの営業時間・予約要否／ホテル駐車場への車のサイズ適合／EarthboatのBBQ設備／宿泊予約（2泊とも確定）。</p>
+</details>
+<details class="cands" id="packing"><summary><span class="sum-t">持ち物リスト</span><span class="sum-h">タップで開く</span></summary><p class="small">チェックすると「完了した項目」に移動し、外すと元に戻ります。チェック状態はこの端末のこのブラウザに保存されます（プライベートブラウズやファイルのプレビュー画面では保存されないことがあります）。</p>
+<div class="checklist" data-list="packing">
+  <div class="grp">貴重品・電子機器</div>
+  <ul class="cl" data-group="貴重品">
+    <li data-id="v1">財布（現金・カード）＋小銭・千円札（Kアリーナのロッカーは現金のみ）</li>
+    <li data-id="v2">運転免許証（身分証を兼ねる）</li>
+    <li data-id="p2">ETCカード</li>
+    <li data-id="v4">ライブ電子チケット（アプリのログイン・表示確認）</li>
+    <li data-id="p5">モバイルバッテリー</li>
+    <li data-id="v5">充電ケーブル</li>
+    <li data-id="v6">車載充電器・スマホホルダー</li>
+    <li data-id="v7">イヤホン</li>
+  </ul>
+  <div class="grp">衣類</div>
+  <ul class="cl" data-group="衣類">
+    <li data-id="w1">トップス 3枚</li>
+    <li data-id="w2">下着 3日分</li>
+    <li data-id="w3">靴下 3日分</li>
+    <li data-id="w4">ボトムス 2本</li>
+    <li data-id="w5">リラックスウェア 1セット（Earthboatにパジャマなし）</li>
+    <li data-id="w6">暖かい上着（Earthboatの夜〜早朝は0℃前後のことも）</li>
+    <li data-id="w7">歩きやすい靴（履いていく）</li>
+  </ul>
+  <div class="grp">洗面・サウナ</div>
+  <ul class="cl" data-group="洗面・サウナ">
+    <li data-id="s6">サウナハット</li>
+    <li data-id="n1">ビニール袋・ジップロック（濡れ物・洗濯物用）</li>
+    <li data-id="n2">洗顔料・スキンケア（Earthboatに備え付けなし）</li>
+    <li data-id="n3">髭剃り</li>
+    <li data-id="n4">整髪料</li>
+    <li data-id="n5">点眼薬・リップクリーム</li>
+    <li data-id="n6">コンタクト・眼鏡・洗浄用品（必要な場合）</li>
+  </ul>
+  <p class="small">タオル・シャンプー・歯ブラシ・サンダルは宿や施設の備え付けを使う。</p>
+  <div class="grp">ライブ用</div>
+  <ul class="cl" data-group="ライブ用">
+    <li data-id="l1">耳栓</li>
+    <li data-id="l2">タオル（ライブ用）</li>
+    <li data-id="l3">サコッシュ・ボディバッグ</li>
+    <li data-id="l4">ペンライト・応援グッズ（必要な場合）</li>
+    <li data-id="l5">グッズ用エコバッグ</li>
+  </ul>
+  <div class="grp">車内・共用</div>
+  <ul class="cl" data-group="車内・共用">
+    <li data-id="k1">サングラス</li>
+    <li data-id="k2">ウェットティッシュ・ティッシュ</li>
+    <li data-id="k3">車内用ゴミ袋</li>
+    <li data-id="k4">折りたたみ傘</li>
+    <li data-id="k5">タンブラー・飲み物（出発時の分）</li>
+    <li data-id="k6">常備薬・絆創膏</li>
+  </ul>
+  <div class="grp">BBQ（家から持っていく物）</div>
+  <ul class="cl" data-group="BBQ">
+    <li data-id="b10">調味料類<ul class="sub-items"><li>焼肉のたれ</li><li>ポン酢</li><li>わさび・柚子胡椒</li><li>にんにく</li><li>レモン汁</li><li>好みの調味料</li></ul></li>
+  </ul>
+  <p class="small">食材・飲み物・紙皿などは上田で買います（DAY 2の<a href="#shopping">買い物リスト</a>）。</p>
+  <details class="done-wrap" open><summary>✅ 完了した項目（<span class="dcount">0</span>）</summary><ul class="cl done"></ul></details>
+</div>
+<div class="note" style="font-size:13.5px"><strong>荷造りの注意</strong><ul style="margin:4px 0 0;padding-left:1.2em"><li>サウナハットは使ったら水気を切って乾かす</li><li>濡れた物は乾くまで密閉しない</li><li>ライブ用バッグは会場の持ち込み規定に合わせる</li></ul></div>
+</details>
+</section>
+
+<!-- ===== DAY 1 ===== -->
+<section id="day1">
+<h2>3. DAY 1｜11月1日（日） 東京 → 名古屋</h2>
+<p class="lead">深夜2時〜明け方は最も眠くなりやすい時間帯。1時間前後ごとに休憩し、そのたびに運転を交代する。眠ければ予定外でも停車。</p>
+
+<ul class="tl">
+<li class="drive"><div class="t">02:00</div><div class="ttl">東京 出発</div><div class="m">合流して出発。首都高 → 東名 → 新東名。飲み物・軽食・充電を確認。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"東京出発（名古屋へ）","s":"2026-11-01T02:00","e":"2026-11-01T02:50","l":"東京","d":"首都高→東名→新東名。眠気が出たら予定外でも停車"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">02:50<br>〜03:10</div><div class="ttl">休憩① EXPASA海老名（下り）</div><div class="m">トイレ・飲み物・運転交代。</div>
+  <div class="btns"><a class="btn" data-q="EXPASA海老名 下り">📍 地図</a><a class="btn cal" data-cal='{"t":"休憩① EXPASA海老名（下り）","s":"2026-11-01T02:50","e":"2026-11-01T03:10","l":"EXPASA海老名 下り","d":"トイレ・運転交代"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">04:00<br>〜04:25</div><div class="ttl">休憩② NEOPASA駿河湾沼津（下り）</div><div class="m">運転交代・ストレッチ・眠気チェック。眠ければ15〜20分仮眠。</div>
+  <div class="btns"><a class="btn" data-q="NEOPASA駿河湾沼津 下り">📍 地図</a><a class="btn cal" data-cal='{"t":"休憩② NEOPASA駿河湾沼津（下り）","s":"2026-11-01T04:00","e":"2026-11-01T04:25","l":"NEOPASA駿河湾沼津 下り","d":"運転交代・眠ければ仮眠"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">05:50<br>〜06:10</div><div class="ttl">休憩③ NEOPASA浜松（下り）</div><div class="m">最後の休憩。ここから大須まで約1時間20分。</div>
+  <div class="btns"><a class="btn" data-q="NEOPASA浜松 下り">📍 地図</a><a class="btn cal" data-cal='{"t":"休憩③ NEOPASA浜松（下り）","s":"2026-11-01T05:50","e":"2026-11-01T06:10","l":"NEOPASA浜松 下り","d":"運転交代"}'>📅 カレンダー</a></div></li>
+<li><div class="t">07:30<br>〜09:45</div><div class="ttl">KIWAMI SAUNA 大須（男性専用）</div><div class="m">近隣のコインパーキングに駐車（施設専用駐車場なし）。サウナ後はそのまま徒歩で大須商店街へ。</div>
+  <div class="btns"><a class="btn route" data-dest="KIWAMI SAUNA 大須 名古屋市中区橘1-4-12">🚗 ルート</a><a class="btn" href="#kiwami-parking">🅿 駐車場の探し方</a><a class="btn cal" data-cal='{"t":"KIWAMI SAUNA 大須","s":"2026-11-01T07:30","e":"2026-11-01T09:45","l":"KIWAMI SAUNA 大須 名古屋市中区橘1-4-12","d":"近隣コインパーキング利用（最大料金ありを選ぶ）"}'>📅 カレンダー</a></div></li>
+<li><div class="t">10:00<br>〜12:00</div><div class="ttl">大須商店街 散策（食べ歩き＋買い物）</div><div class="m">車はコインパーキングに置いたまま徒歩で回る。<a href="#osu-walk">立ち寄り候補5か所</a></div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"大須商店街 散策","s":"2026-11-01T10:00","e":"2026-11-01T12:00","l":"大須商店街 名古屋市中区大須","d":"大須観音→大須ういろ→アメ横・古着→揚げまん棒→台湾唐揚げ"}'>📅 カレンダー</a></div></li>
+<li><div class="t">12:00<br>〜13:00</div><div class="ttl">大須で昼食</div><div class="m"><a href="#osu-lunch">昼食候補5店</a>から当日選ぶ。うなぎ・味噌カツは昼に並ぶことがあるので早めに。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"大須で昼食","s":"2026-11-01T12:00","e":"2026-11-01T13:00","l":"大須商店街 名古屋市中区大須","d":"候補：昼だけうなぎ屋／すゞ家／昔の矢場とん／なごみどり／どて八丁"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">13:15<br>〜13:40</div><div class="ttl">大須 → 熱田神宮へ移動</div><div class="m">約6km・市内一般道で20〜25分（目安）。東門駐車場（無料・約300台・7:00〜17:00 ※第三者サイト情報）を目指す。11月は七五三で混む可能性あり。</div>
+  <div class="btns"><a class="btn route" data-dest="熱田神宮 東門駐車場">🚗 東門駐車場へ</a></div></li>
+<li><div class="t">13:40<br>〜14:40</div><div class="ttl">熱田神宮 参拝・御朱印</div><div class="m">境内は終日参拝可（名古屋市観光公式）。御朱印は7:00〜日没頃まで（確実に受けるなら16:00〜16:30頃まで）※確認済。宝物館・草薙館は9:00〜16:30。</div><div class="card" style="margin:6px 0"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.nagoya-info.jp/upload/spots/large/17957253365e2ff131efc67.jpg" alt="熱田神宮 本宮" onerror="imgFail(this)"><div class="cap">出典：名古屋市観光公式「名古屋コンシェルジュ」</div></div></div>
+  <div class="btns"><a class="btn" data-q="熱田神宮 名古屋市熱田区神宮1-1-1">📍 地図</a><a class="btn" href="https://www.atsutajingu.or.jp/" target="_blank" rel="noopener">🌐 公式ページ</a><a class="btn cal" data-cal='{"t":"熱田神宮 参拝・御朱印","s":"2026-11-01T13:40","e":"2026-11-01T14:40","l":"熱田神宮 名古屋市熱田区神宮1-1-1","d":"東門駐車場（無料）。御朱印は7:00〜日没頃（16時台前半までが安心）"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">14:40<br>〜15:10</div><div class="ttl">ホテルへ移動・チェックイン</div><div class="m">中日ビル地下駐車場へ入庫（7:00〜24:00、先着順）。</div>
+  <div class="btns"><a class="btn route" data-dest="ザ ロイヤルパークホテル アイコニック 名古屋 中日ビル">🚗 ルート</a><a class="btn cal" data-cal='{"t":"ホテル チェックイン","s":"2026-11-01T14:40","e":"2026-11-01T15:10","l":"ザ ロイヤルパークホテル アイコニック 名古屋 名古屋市中区栄4-1-1","d":"中日ビル地下駐車場（1泊1,800円・先着順・入出庫7:00-24:00）"}'>📅 カレンダー</a></div></li>
+<li class="key"><div class="t">15:10<br>〜17:45</div><div class="ttl">休憩・仮眠（重要）</div><div class="m">深夜移動の疲れを回復。翌朝以降の運転のためにも、ここでしっかり眠る。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"ホテルで仮眠","s":"2026-11-01T15:10","e":"2026-11-01T17:45","l":"ザ ロイヤルパークホテル アイコニック 名古屋","d":"深夜移動の疲労回復"}'>📅 カレンダー</a></div></li>
+<li><div class="t">18:00<br>〜19:15</div><div class="ttl">ホテルサウナ（25F・宿泊者専用）</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"ホテルサウナ（25F）","s":"2026-11-01T18:00","e":"2026-11-01T19:15","l":"ザ ロイヤルパークホテル アイコニック 名古屋","d":"宿泊者専用サウナ"}'>📅 カレンダー</a></div></li>
+<li><div class="t">19:30<br>〜21:30</div><div class="ttl">名古屋めしの夕食</div><div class="m"><a href="#nagoya-dinner">夕食候補3店</a>。予約は必須にせず当日の状況で選ぶ。食後は BAR 蒼（24F）または女子大小路を気分で。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"名古屋めし 夕食","s":"2026-11-01T19:30","e":"2026-11-01T21:30","l":"名古屋市中区栄","d":"候補：伍味酉 栄町店／手羽先むつみ 本店／ふみ屋 錦本店"}'>📅 カレンダー</a></div></li>
+<li><div class="t">23:30</div><div class="ttl">就寝目安</div><div class="m">翌朝はプランAなら7:50、プランBなら9:05起床。</div></li>
+</ul>
+
+<details class="cands" id="kiwami-parking"><summary><span class="sum-t">KIWAMI SAUNA と周辺の駐車</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">KIWAMI SAUNA 大須 と周辺の駐車</p>
+<div class="grid">
+  <div class="card rec">
+    <div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://img.sauna-ikitai.com/sauna/93604_20251119_135432_0wCXNaUOIZ_large.png" alt="KIWAMI SAUNA 大須" onerror="imgFail(this)"><div class="cap">出典：サウナイキタイ</div></div>
+    <div class="body">
+      <div class="name">KIWAMI SAUNA 大須 <span class="badge b-fix">利用確定</span></div>
+      <dl><dt>住所</dt><dd>名古屋市中区橘1-4-12（大須商店街まで徒歩約5分、大須観音駅から徒歩約7分）</dd>
+      <dt>駐車場</dt><dd>施設専用なし → 近隣コインパーキング</dd></dl>
+      <div class="btns"><a class="btn" href="https://sauna-ikitai.com/saunas/93604" target="_blank" rel="noopener">施設情報（サウナイキタイ）</a><a class="btn route" data-dest="KIWAMI SAUNA 大須 名古屋市中区橘1-4-12">🚗 ルート</a></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div>
+    <div class="body">
+      <div class="name">周辺コインパーキングの選び方 <span class="badge b-chk">要確認</span></div>
+      <p>7:30頃〜13:15頃まで<strong>約6時間</strong>停めっぱなしになるため、<strong>「最大料金あり」の平置き</strong>を選ぶ。車（全高約1.7m）は全高1.55m制限の機械式に入らない点に注意。</p>
+      <p class="small">予約制（特P・akippa）なら当日満車の心配がない。例：橘1-21-24の予約制（平置き、全長5.0m・全幅2.0m以下、KIWAMIから徒歩数分の距離）など。空き・料金は予約サイトで要確認。</p>
+      <div class="btns"><a class="btn" data-q="駐車場 名古屋市中区橘1丁目">🅿 周辺の駐車場（Googleマップ）</a><a class="btn" href="https://times-info.net/P23-aichi/C106/A012/" target="_blank" rel="noopener">タイムズ（橘周辺）</a><a class="btn" href="https://toku-p.earth-car.com/" target="_blank" rel="noopener">特P（予約制）</a></div>
+    </div>
+  </div>
+</div>
+
+</details>
+<details class="cands" id="osu-walk"><summary><span class="sum-t">大須散策の立ち寄り候補（5か所）</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">大須散策｜立ち寄り候補5か所（食べ歩き2・買い物2・参拝1）</p>
+<p class="small">回る順の一例：①大須観音 → ②大須ういろ → ③第1アメ横ビル・古着 → ④揚げまん棒 → ⑤台湾唐揚げ → 昼食。食べ歩きはシェアして、昼食の分を空けておく。</p>
+<div class="card" style="margin:6px 0 10px"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.nagoya-info.jp/upload/spots/large/16771994045e32706e1d79f.jpg" alt="大須商店街" onerror="imgFail(this)"><div class="cap">出典：名古屋市観光公式「名古屋コンシェルジュ」（大須商店街）</div></div></div><div class="grid">
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://static.gltjp.com/glt/data/directory/12000/11766/20230101_104305_1180f55a_w1920.webp" alt="大須観音" onerror="imgFail(this)"><div class="cap">出典：GOOD LUCK TRIP</div></div><div class="body">
+    <div class="name">① 大須観音 <span class="badge b-cand">参拝</span></div>
+    <dl><dt>住所</dt><dd>中区大須2-21-47</dd><dt>時間</dt><dd>境内自由</dd></dl>
+    <p>大須のシンボル。朱色の本堂と大提灯。散策のスタート地点に。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>大須観音駅からすぐで、散策のスタート地点にちょうどいい</li><li>境内は自由に入れるので、お店が開く前の10時台から楽しめる</li><li>朱色の本堂と大提灯で、名古屋らしい写真が撮れる</li></ul></div><div class="btns"><a class="btn" data-q="大須観音 名古屋市中区大須2-21-47">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/341281/aa10666037453e312707f7ab66cc8199.jpg?token=40d97be&api=v2" alt="大須ういろ 本店" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">② 大須ういろ <span class="badge b-cand">買い物・土産</span></div>
+    <dl><dt>住所</dt><dd>中区大須2-18-42</dd><dt>時間</dt><dd>9:30〜19:00（まっぷる掲載）</dd></dl>
+    <p>名古屋名物ういろの老舗。こしあん入りの「ないろ」も。日持ちするので土産に。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>9:30開店で、朝から開いている数少ない店</li><li>日持ちするので、旅の初日に買っても持ち帰れる</li><li>こしあん入りの「ないろ」など、ここでしか買えないものがある</li></ul></div><div class="btns"><a class="btn" data-q="大須ういろ 名古屋市中区大須2-18-42">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">③ 第1アメ横ビル周辺・古着店 <span class="badge b-cand">買い物</span></div>
+    <dl><dt>場所</dt><dd>大須・赤門通〜東仁王門通周辺</dd><dt>時間</dt><dd>店舗ごとに異なる <span class="badge b-chk">要確認</span></dd></dl>
+    <p>電気街・ホビーと古着・雑貨が集まるエリア。午前は11時開店の店も多いので、開いている店から見る。古着好きなら KAKAVAKA nagoya（日曜13:00開店の掲載あり）は昼食後の時間調整にも。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>電気街と古着・雑貨が同じ一帯にあり、買い物をまとめて楽しめる</li><li>食べ歩きの合間にはさむと、お腹を休められる</li></ul></div><div class="btns"><a class="btn" data-q="第1アメ横ビル 名古屋市中区大須">📍 地図</a><a class="btn" data-q="大須 古着屋">👕 古着店を検索</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">④ 納屋橋饅頭万松庵 大須万松寺通店 <span class="badge b-cand">食べ歩き</span></div>
+    <dl><dt>住所</dt><dd>中区大須3-27-24</dd><dt>時間</dt><dd>10:00〜19:00（まっぷる掲載）</dd></dl>
+    <p>納屋橋まんじゅうをドーナツ生地で包んで揚げた「揚げまん棒」は万松寺通店の限定品。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>揚げまん棒は大須万松寺通店だけの限定品</li><li>1本150円（まっぷる掲載）と少量で、食べ歩きにちょうどいい</li><li>甘い系なので、唐揚げとのバランスがいい</li></ul></div><div class="btns"><a class="btn" data-q="納屋橋饅頭万松庵 大須万松寺通店">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/26109/26109365.jpg?token=41853ac&api=v2" alt="李さんの台湾名物屋台 本店" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">⑤ 李さんの台湾名物屋台 本店 <span class="badge b-cand">食べ歩き</span></div>
+    <dl><dt>住所</dt><dd>中区大須3-35-10</dd><dt>時間</dt><dd><span class="badge b-chk">要確認</span></dd></dl>
+    <p>大須の唐揚げブームの火付け役。辛さを調整できる大きな台湾唐揚げをシェア。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>大須の唐揚げブームの火付け役で、大須らしさが一番出る</li><li>辛さを調整できる</li><li>大きめなのでシェアするのにちょうどいい</li></ul></div><div class="btns"><a class="btn" data-q="李さんの台湾名物屋台 本店 名古屋市中区大須3-35-10">📍 地図</a></div></div></div>
+</div>
+<p class="small">番外：万松寺（白龍のからくり演出）、新雀本店のみたらし団子（13:00開店のため今回の時間帯では難しい）。</p>
+
+</details>
+<details class="cands" id="osu-lunch"><summary><span class="sum-t">大須ランチ候補（5店）</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">大須ランチ候補（12:00〜13:00）</p>
+<div class="grid">
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://unagihirudake.com/wp-content/themes/hirudakeunagi-corp/assets/images/page/top/brand-hirudake.webp" alt="昼だけうなぎ屋" onerror="imgFail(this)"><div class="cap">出典：昼だけうなぎ屋 公式（ブランド画像・大須店の写真ではありません）</div></div><div class="body">
+    <div class="name">昼だけうなぎ屋 大須店 <span class="badge b-cand">うなぎ</span></div>
+    <dl><dt>住所</dt><dd>中区大須2-32-25</dd><dt>時間</dt><dd>11:00〜14:30（LO14:00、なくなり次第終了）※確認済</dd></dl>
+    <p>国産うなぎを炭火焼きで手頃な価格に。昼のみ営業で売り切れ終了もあるため、12時前に。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>名古屋名物のうなぎを、相場の約半額をうたう手頃な価格で食べられる</li><li>提供までの時間が短く（約10分を目標とする店）、旅程が押しにくい</li><li>昼のみ・売り切れ終了なので、12時前に入るのが確実</li></ul></div><div class="btns"><a class="btn" href="https://unagihirudake.com/shop/" target="_blank" rel="noopener">🌐 公式ページ</a><a class="btn" data-q="昼だけうなぎ屋 大須店 名古屋市中区大須2-32-25">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.nagoya-info.jp/upload/foods/large/54070756862fdb968a0f70.jpeg" alt="すゞ家 赤門店" onerror="imgFail(this)"><div class="cap">出典：名古屋市観光公式「名古屋コンシェルジュ」</div></div><div class="body">
+    <div class="name">すゞ家 赤門店 <span class="badge b-cand">とんかつ・味噌カツ</span></div>
+    <dl><dt>住所</dt><dd>中区大須3-11-17</dd><dt>時間</dt><dd>11:00〜15:00（LO14:30）、木曜定休 → 日曜は営業（名古屋市観光公式）</dd></dl>
+    <p>昭和22年創業の老舗洋食。細かいパン粉のサクサクとんかつ、味噌ロースカツ定食。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>昭和22年創業の老舗で、名古屋市の観光公式サイトにも掲載</li><li>細かいパン粉のサクサクのとんかつと、味噌カツのどちらも選べる</li><li>5候補の中で一番「老舗の洋食店」らしい雰囲気</li></ul></div><div class="btns"><a class="btn" href="https://www.nagoya-info.jp/gourmet/detail/100/" target="_blank" rel="noopener">🌐 名古屋市観光公式</a><a class="btn" data-q="すゞ家 赤門店 名古屋市中区大須3-11-17">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://static.gltjp.com/glt/data/directory/15000/14771/20230912_091509_5cefc2b3_w1920.webp" alt="昔の矢場とん" onerror="imgFail(this)"><div class="cap">出典：GOOD LUCK TRIP（施設公式確認済みの掲載）</div></div><div class="body">
+    <div class="name">昔の矢場とん <span class="badge b-cand">味噌カツ</span></div>
+    <dl><dt>住所</dt><dd>中区大須2-21-32（大須観音すぐ）</dd><dt>時間</dt><dd>11:00〜21:00（LO20:30）、無休（施設掲載）</dd></dl>
+    <p>矢場とん創業当時がコンセプトの店。王道の味噌カツを確実に食べたいときの保険。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>無休・通し営業なので、時間がずれても確実に入れる</li><li>名古屋の味噌カツの代表格の味</li><li>大須観音のすぐそばで、散策ルートの途中にある</li></ul></div><div class="btns"><a class="btn" href="https://www.yabaton.com/" target="_blank" rel="noopener">🌐 矢場とん公式</a><a class="btn" data-q="昔の矢場とん 名古屋市中区大須2-21-32">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/196398/a3d9ed45451c8470c9319cda5e98ee10.jpg?token=5f4a0cd&api=v2" alt="なごみどり" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">地鶏料理 なごみどり <span class="badge b-cand">鶏料理</span></div>
+    <dl><dt>住所</dt><dd>中区大須3-33-1</dd><dt>時間</dt><dd>日祝 11:00〜20:00（通し営業）※確認済</dd></dl>
+    <p>とりカツ・手羽先など鶏料理。夜の手羽先と重なるので、昼は別ジャンルにするのも手。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>日祝は11:00〜20:00の通し営業で、混む時間を外しやすい</li><li>鶏料理中心で、昼を味噌カツ以外にしたいときの選択肢</li></ul></div><div class="btns"><a class="btn" data-q="地鶏料理 なごみどり 名古屋市中区大須3-33-1">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">串八丁どて八丁 <span class="badge b-cand">串カツ・どて煮</span></div>
+    <dl><dt>住所</dt><dd>中区大須2-18-15</dd><dt>時間</dt><dd>11:00〜19:00、水曜定休（土日は11:30頃開店の場合あり）※確認済</dd></dl>
+    <p>味噌の串カツ・どて煮。軽めに済ませて食べ歩きの余地を残したいときに。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>どて煮・串カツで、名古屋の味噌の味を手軽に楽しめる</li><li>軽めに済ませられるので、食べ歩きの余地を残せる</li></ul></div><div class="btns"><a class="btn" data-q="串八丁どて八丁 名古屋市中区大須2-18-15">📍 地図</a></div></div></div>
+</div>
+
+</details>
+<details class="cands" id="nagoya-dinner"><summary><span class="sum-t">名古屋めし夕食候補（3店）</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">名古屋めしの夕食候補（19:30頃・ホテルから徒歩圏）</p>
+<div class="grid">
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://gomitori-sakaemachi.com/assets/site/food-tebasaki.webp" alt="伍味酉 手羽先" onerror="imgFail(this)"><div class="cap">出典：伍味酉 栄町店 公式サイト</div></div><div class="body">
+    <div class="name">伍味酉 栄町店</div>
+    <dl><dt>時間</dt><dd>日祝 17:00〜24:00（公式サイト掲載の過去確認）<span class="badge b-chk">要確認</span></dd></dl>
+    <p>手羽先・味噌系・名古屋めしを一通り頼みたいとき。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>手羽先・味噌系など名古屋めしを1軒で一通り頼める</li><li>日祝も24:00まで営業で、遅くなっても安心</li><li>公式サイトでメニューや写真を事前に確認できる</li></ul></div><div class="btns"><a class="btn" data-q="伍味酉 栄町店">📍 地図</a><a class="btn" href="https://gomitori-sakaemachi.com/" target="_blank" rel="noopener">公式</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/364669/8954c2b5b55fdc8431c3b6e32d6171d6.jpg?token=6c6bf35&api=v2" alt="手羽先むつみ 本店" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">手羽先むつみ 本店</div>
+    <dl><dt>時間</dt><dd>17:00〜24:00（公式店舗情報の過去確認）<span class="badge b-chk">要確認</span></dd></dl>
+    <p>手羽先専門店（栄3丁目）。小規模店なので混雑時は待ちあり。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>手羽先専門店で、手羽先を一番の目当てにするならここ</li><li>24:00まで営業</li></ul></div><div class="btns"><a class="btn" data-q="手羽先むつみ 本店 名古屋市中区栄">📍 地図</a><a class="btn" href="https://tebasaki623.co.jp/ja/shops" target="_blank" rel="noopener">公式</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/147819/147819921.jpg?token=a0b3086&api=v2" alt="ふみ屋 錦本店" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">幸せ食堂 ふみ屋 錦本店</div>
+    <dl><dt>住所</dt><dd>中区錦3-17-7（食べログ掲載）</dd><dt>時間</dt><dd><span class="badge b-chk">要確認</span></dd></dl>
+    <p>手羽先・味噌おでん・どて煮・串カツをまとめて頼める。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>味噌おでん・どて煮・串カツなどを少しずつ頼める</li><li>いろいろつまみたいときに向く</li></ul></div><div class="btns"><a class="btn" data-q="幸せ食堂 ふみ屋 錦本店">📍 地図</a></div></div></div>
+</div>
+</details>
+</section>
+
+<!-- ===== DAY 2 ===== -->
+<section id="day2">
+<h2>4. DAY 2｜11月2日（月） 名古屋 → 上田・Earthboat</h2>
+<p class="lead">当日の体調と時間で選べるよう、2つのプランを用意しています。どちらもモーニングなしで、Earthboatに<strong>15:15ごろ</strong>到着（15:00〜15:30）。運転時間はGoogleマップの目安（通常の交通量）です。</p>
+<div class="scroll"><table class="cmp">
+<tr><th></th><th><a href="#day2a">プランA</a><br><span class="small">諏訪大社に寄る</span></th><th><a href="#day2b">プランB</a><br><span class="small">寄らない</span></th></tr>
+<tr><td>起床</td><td><strong>7:50</strong></td><td><strong>9:05</strong></td></tr>
+<tr><td>出発</td><td>8:50</td><td>10:05</td></tr>
+<tr><td>運転時間</td><td>約4時間11分</td><td>約3時間47分</td></tr>
+<tr><td>観光</td><td>諏訪大社 下社秋宮（約1時間半・昼食込み）</td><td>なし</td></tr>
+<tr><td>昼食</td><td>秋宮の門前・周辺</td><td>駒ヶ岳SA</td></tr>
+<tr><td>買い出し</td><td colspan="2">ツルヤ 稲荷山店（どちらも同じ）</td></tr>
+<tr><td>Earthboat着</td><td colspan="2">15:15ごろ（山道は地蔵峠経由・明るいうちに）</td></tr>
+</table></div>
+<div class="plans">
+<div class="plan-tabs" role="tablist">
+  <button type="button" class="ptab" data-plan="a" id="ptab-a">プランA<span>諏訪大社に寄る</span></button>
+  <button type="button" class="ptab" data-plan="b" id="ptab-b">プランB<span>寄らない</span></button>
+</div>
+<div class="plan-panel" id="day2a" data-plan="a">
+<h3>DAY 2 A｜諏訪大社に寄る</h3>
+<ul class="tl">
+<li><div class="t">07:50</div><div class="ttl">起床・荷造り</div><div class="m">朝食は中日ビルB1のファミリーマート（7:00〜23:00、予約サイト掲載）で買って車内で。</div></li>
+<li><div class="t">08:35</div><div class="ttl">チェックアウト・出庫</div><div class="m">中日ビル地下駐車場は7:00から出庫可。</div></li>
+<li class="drive"><div class="t">08:50</div><div class="ttl">名古屋を出発</div><div class="m">名古屋高速 → 中央道（上り）→ 諏訪方面。運転2時間30分（200km）。休憩なしの連続運転になるので、眠ければ予定外でも駒ヶ岳SAなどで休憩・交代。</div>
+  <div class="btns"><a class="btn route" data-leg="ザ ロイヤルパークホテル アイコニック 名古屋|諏訪大社 下社秋宮 長野県諏訪郡下諏訪町5828|ツルヤ 稲荷山店 千曲市稲荷山1332|Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">🗺 プランAの全ルート</a><a class="btn cal" data-cal='{"t": "名古屋出発（諏訪大社へ）", "s": "2026-11-02T08:50", "e": "2026-11-02T11:20", "l": "ザ ロイヤルパークホテル アイコニック 名古屋", "d": "中央道経由。運転約2時間30分"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">（必要時）</div><div class="ttl">駒ヶ岳SA（上り）で休憩</div><div class="m">眠気・疲れがあれば迷わず入る。</div>
+  <div class="btns"><a class="btn" data-q="駒ヶ岳サービスエリア 上り">📍 地図</a></div></li>
+<li><div class="t">11:20<br>〜12:55</div><div class="ttl">諏訪大社 下社秋宮 参拝・昼食</div><div class="m">参拝45〜60分＋門前・周辺で昼食。押したら昼食を短くして調整。<a href="#suwa">見どころ・御朱印</a></div>
+  <div class="btns"><a class="btn route" data-dest="諏訪大社 下社秋宮 長野県諏訪郡下諏訪町5828">🚗 ルート</a><a class="btn cal" data-cal='{"t": "諏訪大社 下社秋宮 参拝・昼食", "s": "2026-11-02T11:20", "e": "2026-11-02T12:55", "l": "諏訪大社 下社秋宮 長野県諏訪郡下諏訪町5828", "d": "授与所 8:30〜17:00（公式）。参拝45〜60分＋昼食"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">12:55<br>〜14:00</div><div class="ttl">ツルヤ 稲荷山店へ</div><div class="m">長野道経由で1時間5分。</div>
+  <div class="btns"><a class="btn route" data-dest="ツルヤ 稲荷山店 千曲市稲荷山1332">🚗 ルート</a></div></li>
+<li><div class="t">14:00<br>〜14:40</div><div class="ttl">ツルヤ 稲荷山店で買い出し</div><div class="m">肉・野菜・きのこ・飲み物・翌朝の朝食をここでまとめて。<a href="#shopping">買い物リスト</a>／<a href="#ueda-shop">買い出し候補</a></div>
+  <div class="btns"><a class="btn cal" data-cal='{"t": "ツルヤ 稲荷山店で買い出し", "s": "2026-11-02T14:00", "e": "2026-11-02T14:40", "l": "ツルヤ 稲荷山店 千曲市稲荷山1332", "d": "9:30〜20:00（公式）。買い物リストを確認"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">14:40<br>〜15:15</div><div class="ttl">Earthboatへ</div><div class="m">県道35号（地蔵峠）経由で36分。山道なので明るいうちに。</div></li>
+<li class="key"><div class="t">15:15</div><div class="ttl">Earthboat Ueda Onsen 到着・チェックイン</div><div class="m">チェックイン15:00〜。</div>
+  <div class="btns"><a class="btn route" data-dest="Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">🚗 ルート</a><a class="btn cal" data-cal='{"t": "Earthboat Ueda Onsen チェックイン", "s": "2026-11-02T15:15", "e": "2026-11-02T15:45", "l": "Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183", "d": "IN 15:00／OUT 10:00。早朝出発の退出手順を確認"}'>📅 カレンダー</a></div></li>
+</ul>
+</div>
+<div class="plan-panel" id="day2b" data-plan="b" hidden>
+<h3>DAY 2 B｜諏訪大社に寄らない</h3>
+<ul class="tl">
+<li><div class="t">09:05</div><div class="ttl">起床・荷造り</div><div class="m">朝食は中日ビルB1のファミリーマート（7:00〜23:00、予約サイト掲載）で買って車内で。</div></li>
+<li><div class="t">09:50</div><div class="ttl">チェックアウト・出庫</div></li>
+<li class="drive"><div class="t">10:05</div><div class="ttl">名古屋を出発</div><div class="m">名古屋高速 → 中央道（上り）→ 岡谷JCT → 長野道。ツルヤ 稲荷山店まで運転3時間11分（261km）。</div>
+  <div class="btns"><a class="btn route" data-leg="ザ ロイヤルパークホテル アイコニック 名古屋|ツルヤ 稲荷山店 千曲市稲荷山1332|Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">🗺 プランBの全ルート</a><a class="btn cal" data-cal='{"t": "名古屋出発（上田へ）", "s": "2026-11-02T10:05", "e": "2026-11-02T12:00", "l": "ザ ロイヤルパークホテル アイコニック 名古屋", "d": "中央道→岡谷JCT→長野道"}'>📅 カレンダー</a></div></li>
+<li><div class="t">12:00ごろ<br>〜12:45</div><div class="ttl">駒ヶ岳SA（上り）で昼食・運転交代</div><div class="m">中央アルプスのふもとのSA。</div>
+  <div class="btns"><a class="btn" data-q="駒ヶ岳サービスエリア 上り">📍 地図</a><a class="btn cal" data-cal='{"t": "昼食 駒ヶ岳SA（上り）", "s": "2026-11-02T12:00", "e": "2026-11-02T12:45", "l": "駒ヶ岳サービスエリア 上り", "d": "昼食・運転交代"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">〜14:00</div><div class="ttl">ツルヤ 稲荷山店に到着</div><div class="m">更埴IC付近。</div>
+  <div class="btns"><a class="btn route" data-dest="ツルヤ 稲荷山店 千曲市稲荷山1332">🚗 ルート</a></div></li>
+<li><div class="t">14:00<br>〜14:40</div><div class="ttl">ツルヤ 稲荷山店で買い出し</div><div class="m">肉・野菜・きのこ・飲み物・翌朝の朝食をここでまとめて。<a href="#shopping">買い物リスト</a>／<a href="#ueda-shop">買い出し候補</a></div>
+  <div class="btns"><a class="btn cal" data-cal='{"t": "ツルヤ 稲荷山店で買い出し", "s": "2026-11-02T14:00", "e": "2026-11-02T14:40", "l": "ツルヤ 稲荷山店 千曲市稲荷山1332", "d": "9:30〜20:00（公式）。買い物リストを確認"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">14:40<br>〜15:15</div><div class="ttl">Earthboatへ</div><div class="m">県道35号（地蔵峠）経由で36分。山道なので明るいうちに。</div></li>
+<li class="key"><div class="t">15:15</div><div class="ttl">Earthboat Ueda Onsen 到着・チェックイン</div><div class="m">チェックイン15:00〜。</div>
+  <div class="btns"><a class="btn route" data-dest="Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183">🚗 ルート</a><a class="btn cal" data-cal='{"t": "Earthboat Ueda Onsen チェックイン", "s": "2026-11-02T15:15", "e": "2026-11-02T15:45", "l": "Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183", "d": "IN 15:00／OUT 10:00。早朝出発の退出手順を確認"}'>📅 カレンダー</a></div></li>
+</ul>
+</div>
+</div>
+<h3>Earthboat到着後（A・B共通）</h3>
+<ul class="tl">
+<li><div class="t">16:00<br>〜18:00</div><div class="ttl">薪サウナ・温泉露天・外気浴</div><div class="m">薪サウナは温度が上がるまで時間がかかるので、着いたらすぐ火入れ。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"薪サウナ・温泉","s":"2026-11-02T16:00","e":"2026-11-02T18:00","l":"Earthboat Ueda Onsen","d":"着いたらすぐ火入れ"}'>📅 カレンダー</a></div></li>
+<li><div class="t">18:00<br>〜20:30</div><div class="ttl">BBQ・夕食</div><div class="m">翌朝6時に運転する人は、お酒を控えめに・早めに切り上げる。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"BBQ・夕食","s":"2026-11-02T18:00","e":"2026-11-02T20:30","l":"Earthboat Ueda Onsen","d":"翌朝の運転者は飲酒を控える"}'>📅 カレンダー</a></div></li>
+<li class="key"><div class="t">21:00<br>〜22:00</div><div class="ttl">荷造り → 22:00までに就寝</div><div class="m">翌朝は05:15起床。荷物は前夜のうちに車へ積めるだけ積んでおく。</div>
+  <div class="btns"><a class="btn cal" data-cal='{"t":"荷造り・就寝（翌5:15起床）","s":"2026-11-02T21:00","e":"2026-11-02T22:00","l":"Earthboat Ueda Onsen","d":"翌朝6:00出発。荷物は前夜に積む"}'>📅 カレンダー</a></div></li>
+</ul>
+
+<details class="cands" id="suwa"><summary><span class="sum-t">諏訪大社 下社秋宮（プランA）</span><span class="sum-h">タップで開く</span></summary>
+<div class="grid">
+  <div class="card rec"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://suwataisha.or.jp/wp-content/themes/suwataisha/assets/images/akimiya-slide-1.jpg" alt="諏訪大社 下社秋宮" onerror="imgFail(this)"><div class="cap">出典：諏訪大社 公式サイト</div></div><div class="body">
+    <div class="name">諏訪大社 下社秋宮 <span class="badge b-cand">観光</span></div>
+    <dl><dt>住所</dt><dd>長野県諏訪郡下諏訪町5828</dd>
+    <dt>参拝</dt><dd>閉門なし・いつでも参拝可（公式）</dd>
+    <dt>授与所</dt><dd>8:30〜17:00（公式）。御朱印の受付時間は公式に明記なし → 授与所の時間内に</dd>
+    <dt>宝物殿</dt><dd>9:30〜15:00（公式）</dd>
+    <dt>滞在</dt><dd>参拝・散策45〜60分＋昼食</dd>
+    <dt>駐車場</dt><dd><span class="badge b-chk">要確認</span>（公式サイトに記載なし）</dd></dl>
+    <p>信濃国一之宮・諏訪大社の4社のひとつ。旧中山道と甲州道中の分岐点にあり、手水には御神湯が流れる（公式）。</p>
+    <div class="rec-pts"><div class="rec-h">見どころ（公式サイトより）</div><ul>
+      <li><strong>神楽殿の大しめ縄</strong>：長さ約13m・重さ推定500kg。御柱祭のたびに新調。神楽殿は重要文化財</li>
+      <li><strong>幣拝殿の彫刻</strong>：江戸中期の名匠・立川和四郎富棟の作（1781年落成）。重要文化財</li>
+      <li><strong>ネイリの杉</strong>：鳥居の正面に立つ御神木。樹齢600〜700年といわれる</li>
+      <li><strong>青銅製の狛犬</strong>：高さ1.7m。かつては青銅製で日本一といわれた</li>
+      <li>本殿を持たず、宝殿の奥のイチイの木を御神体とする</li>
+    </ul></div>
+    <div class="btns"><a class="btn route" data-dest="諏訪大社 下社秋宮 長野県諏訪郡下諏訪町5828">🚗 ここへのルート</a><a class="btn" href="https://suwataisha.or.jp/about/miyamori/shimoshaakimiya/" target="_blank" rel="noopener">🌐 公式ページ</a><a class="btn" data-q="諏訪大社 下社秋宮">📍 地図</a></div>
+  </div></div>
+</div>
+</details>
+<details class="cands" id="shopping"><summary><span class="sum-t">買い物リスト（ツルヤ 稲荷山店）</span><span class="sum-h">タップで開く</span></summary>
+<p class="small" style="margin:6px 0 0">チェックすると「完了した項目」に移動します。調理器具・食器・塩・胡椒・オリーブオイルはEarthboatに備え付けがあります。<a href="#ueda-shop">買い出し候補</a></p>
+<div class="checklist" data-list="shopping">
+  <div class="grp">ツルヤ 稲荷山店（A・B共通）</div>
+  <ul class="cl" data-group="ツルヤ">
+    <li data-id="sh1">BBQ用の肉（牛・豚・鶏から2〜3種）</li>
+    <li data-id="sh2">ご飯・おにぎり（BBQ用）</li>
+    <li data-id="sh3">飲み物（運転する人用のお茶・ノンアルも）</li>
+    <li data-id="sh4">翌朝の朝食（車内で食べやすいパン・おにぎりなど）</li>
+    <li data-id="sh6">野菜・きのこ（焼き野菜用）</li>
+    <li data-id="sh7">果物（翌朝用・お好みで）</li>
+    <li data-id="sh5">必要に応じて紙皿・割り箸・ウェットティッシュ</li>
+  </ul>
+  <details class="done-wrap" open><summary>✅ 完了した項目（<span class="dcount">0</span>）</summary><ul class="cl done"></ul></details>
+</div>
+</details>
+<details class="cands" id="morning"><summary><span class="sum-t">モーニング候補（月曜営業）</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">名古屋モーニング候補（月曜営業・チェーン以外）</p>
+<div class="grid">
+  <div class="card rec"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/197017/186ddab109d0de5064f5766f5c6fb62a.jpg?token=4d73555&api=v2" alt="加藤珈琲店" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">加藤珈琲店 <span class="badge b-rec">第一候補</span></div>
+    <dl><dt>住所</dt><dd>名古屋市東区東桜1-3-2 さくらビル1F（久屋大通駅すぐ）</dd><dt>時間</dt><dd>8:00〜16:00、水曜定休 → 月曜は営業（食べログ公式情報）</dd><dt>距離</dt><dd>ホテルから徒歩約8分</dd></dl>
+    <p>1986年創業の自家焙煎の喫茶。食べログ喫茶店百名店2026。モーニングの「名古屋セット」や小倉トースト。席数が少ないので開店直後に。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>ホテルから徒歩約8分で、車を出さずに行ける</li><li>自家焙煎で、食べログの喫茶店百名店2026に選ばれていて、コーヒーの質は3候補で一番</li><li>8:00開店で、8:45の出発時刻に合う</li></ul></div><div class="btns"><a class="btn" href="https://tabelog.com/aichi/A2301/A230103/23006305/" target="_blank" rel="noopener">店舗公式情報（食べログ）</a><a class="btn" data-q="加藤珈琲店 名古屋市東区東桜1-3-2">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://static.gltjp.com/glt/data/directory/14000/13486/20220819_223715_5175562f_w1920.webp" alt="洋菓子・喫茶ボンボン" onerror="imgFail(this)"><div class="cap">出典：GOOD LUCK TRIP（施設公式確認済みの掲載）</div></div><div class="body">
+    <div class="name">洋菓子・喫茶ボンボン <span class="badge b-cand">第二候補</span></div>
+    <dl><dt>住所</dt><dd>名古屋市東区泉2-1-22（高岳駅から徒歩5分）</dd><dt>時間</dt><dd>8:00〜21:00、無休（施設公式確認の掲載）</dd></dl>
+    <p>1949年創業、赤いソファの昭和レトロ純喫茶。モーニングの内容は当日確認。加藤珈琲店が満席のときに。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>無休・8:00開店で、月曜でも確実に開いている</li><li>1949年創業で、昭和レトロな純喫茶の雰囲気は3候補で一番</li><li>ケーキで有名なので、甘いもの好きに</li></ul></div><div class="btns"><a class="btn" href="https://www.gltjp.com/ja/directory/item/13486/" target="_blank" rel="noopener">施設公式確認の情報（GLTJP）</a><a class="btn" data-q="洋菓子・喫茶ボンボン 名古屋市東区泉2-1-22">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://tblg.k-img.com/resize/640x640c/restaurant/images/Rvw/205486/b7f8adee8778455aecd47ac25ac376f3.jpg?token=521c59e&api=v2" alt="喫茶七番" onerror="imgFail(this)"><div class="cap">出典：食べログ（投稿写真）</div></div><div class="body">
+    <div class="name">喫茶七番 <span class="badge b-cand">候補</span></div>
+    <dl><dt>場所</dt><dd>中区錦2丁目（オリマチ錦1F、伏見駅徒歩5分）</dd><dt>時間</dt><dd>月曜も営業 7:30〜18:00、モーニング7:30〜11:00 ※確認済</dd></dl>
+    <p>地元のパン屋や製餡所の素材を使う名古屋モーニング。7:30開店なので、早めに出発したい日はこちらが便利（ホテルから約1.2km、徒歩約15分）。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>7:30開店で3候補の中で一番早く、早めに出発したい日に</li><li>地元のパン屋や製餡所の素材を使った名古屋モーニング</li></ul></div><div class="btns"><a class="btn" href="https://tabelog.com/aichi/A2301/A230102/23081612/" target="_blank" rel="noopener">店舗情報（食べログ）</a><a class="btn" data-q="喫茶七番 名古屋市中区錦2丁目">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">その他（月曜営業・時間とも要確認）</div>
+    <p>喫茶リッチ（名古屋駅エスカ地下街。7:00開店の過去情報あり、駅方面で今回のルートからは外れる）／Cafe Rassure（矢場町）／エーデルワイス（東桜）／喫茶ニューポピー（四間道）。</p>
+    <div class="btns"><a class="btn" data-q="喫茶リッチ エスカ地下街">リッチ</a><a class="btn" data-q="Cafe Rassure 名古屋 栄">Rassure</a><a class="btn" data-q="喫茶 エーデルワイス 名古屋 東桜">エーデルワイス</a><a class="btn" data-q="喫茶ニューポピー 名古屋">ニューポピー</a></div></div></div>
+</div>
+
+</details>
+<details class="cands" id="ueda-shop"><summary><span class="sum-t">買い出し候補</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">A・Bとも<strong>ツルヤ 稲荷山店</strong>1か所でまとめて買う。上田側の店（上田中央店・新鮮市真田・西友 真田店）は、今回の経路から外れるため予備の候補。足りない物はEarthboat敷地内の無人販売で補う。</p>
+<div class="grid">
+  <div class="card rec"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.tsuruya-corp.co.jp/web/wp-content/uploads/2024/06/53_inariyama.jpg" alt="ツルヤ 稲荷山店" onerror="imgFail(this)"><div class="cap">出典：ツルヤ 公式サイト</div></div><div class="body">
+    <div class="name">ツルヤ 稲荷山店 <span class="badge b-rec">メイン（A・B共通）</span></div>
+    <dl><dt>住所</dt><dd>千曲市稲荷山1332（公式）</dd><dt>時間</dt><dd>9:30〜20:00（公式）</dd><dt>駐車場</dt><dd>253台（公式）</dd></dl>
+    <p>長野県のスーパー・ツルヤの店舗。更埴IC付近にあり、Earthboatまで県道35号（地蔵峠）経由で36分。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>名古屋からEarthboatへの最短ルートの途中にあり、寄り道がほぼない</li><li>肉・野菜・きのこ・飲み物・朝食を1か所でそろえられる</li><li>駐車場253台で、停めやすい</li></ul></div>
+    <div class="btns"><a class="btn route" data-dest="ツルヤ 稲荷山店 千曲市稲荷山1332">🚗 ここへのルート</a><a class="btn" href="https://www.tsuruya-corp.co.jp/store/inariyama/" target="_blank" rel="noopener">🌐 公式ページ</a></div>
+  </div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.tsuruya-corp.co.jp/web/wp-content/uploads/2024/06/07_ueda.jpg" alt="ツルヤ 上田中央店" onerror="imgFail(this)"><div class="cap">出典：ツルヤ 公式サイト</div></div><div class="body">
+    <div class="name">ツルヤ 上田中央店 <span class="badge b-cand">予備（上田側経由のとき）</span></div>
+    <dl><dt>時間</dt><dd>9:30〜20:00（日曜9:00〜）※トクバイ掲載</dd></dl>
+    <p>長野県のスーパー。信州産の肉・野菜やオリジナル商品（ジャム・ドレッシング等）が充実し、品質重視の買い出しに向く。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>長野県の地元スーパーで、信州産の食材やオリジナル商品の品質に定評がある</li><li>肉・飲料・朝食・調味料を1か所でそろえられる</li><li>上田市の中心部にあり、ICから寄りやすい</li></ul></div><div class="btns"><a class="btn" href="https://www.tsuruya-corp.co.jp/store/uedachuou/" target="_blank" rel="noopener">🌐 公式ページ</a><a class="btn" data-q="ツルヤ 上田中央店">📍 地図</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.city.ueda.nagano.jp/uploaded/image/29305.JPG" alt="新鮮市真田" onerror="imgFail(this)"><div class="cap">出典：上田市公式サイト</div></div><div class="body">
+    <div class="name">新鮮市真田（JA直売所）</div>
+    <dl><dt>住所</dt><dd>上田市真田町長6114-2（過去確認）</dd><dt>時間</dt><dd>11月は9:00〜16:00、水曜定休 → 月曜営業（上田市公式）</dd></dl>
+    <p>地元の野菜・きのこ・果物。BBQ用のきのこや焼き野菜、翌朝の果物に。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>地元農家の直売で、野菜・きのこの鮮度は4候補で一番</li><li>Earthboatと同じ真田町にあり、宿へ向かう途中で寄れる</li></ul></div><div class="btns"><a class="btn" data-q="新鮮市真田 上田市真田町長6114-2">📍 地図</a><a class="btn" href="https://www.city.ueda.nagano.jp/soshiki/nosanmarket/1193.html" target="_blank" rel="noopener">上田市公式</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.seiyu.co.jp/assets/images/sanada.jpg" alt="西友 真田店" onerror="imgFail(this)"><div class="cap">出典：西友 公式サイト</div></div><div class="body">
+    <div class="name">西友 真田店（補充用）</div>
+    <dl><dt>住所</dt><dd>上田市真田町本原614-1（過去確認）</dd><dt>時間</dt><dd>年中無休・無料駐車場78台（西友公式）。営業時間 <span class="badge b-chk">要確認</span></dd></dl>
+    <p>Earthboatへの道中。飲料・氷・不足品の補充に。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>6:00〜23:00・年中無休で、時間を気にせず買い足せる</li><li>Earthboatに近く、氷や飲み物の追加に便利</li></ul></div><div class="btns"><a class="btn" data-q="西友 真田店 上田市">📍 地図</a><a class="btn" href="https://www.seiyu.co.jp/shop/%E8%A5%BF%E5%8F%8B%E7%9C%9F%E7%94%B0%E5%BA%97/" target="_blank" rel="noopener">公式</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">イオンスタイル上田（代替）</div>
+    <dl><dt>住所</dt><dd>上田市常田2-12-18</dd><dt>時間</dt><dd>食品売場 8:00〜23:00（掲載情報）</dd></dl>
+    <p>品揃えの幅が必要なときの代替。上田駅寄りでEarthboatとは逆方向になりやすい。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>品揃えの幅は4候補で一番広い</li><li>食品売場は23:00まで営業</li></ul></div><div class="btns"><a class="btn" data-q="イオンスタイル上田 上田市常田2-12-18">📍 地図</a></div></div></div>
+</div>
+<p class="small">買う物は<a href="#shopping">買い物リスト</a>にまとめています。</p>
+
+</details>
+<details class="cands" id="sa"><summary><span class="sum-t">中央道のSA</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">道中の休憩候補。すべて寄る前提ではなく、眠気や疲れに合わせて使う。プランBは駒ヶ岳SAで昼食。</p>
+<div class="grid">
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body"><div class="name">恵那峡SA（上り）</div><p>出発から約1時間。A・Bとも予定には入れていないが、眠気があれば最初の休憩に。</p><div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>出発から約1時間で、最初の運転交代にちょうどいい位置</li></ul></div><div class="btns"><a class="btn" data-q="恵那峡サービスエリア 上り">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body"><div class="name">駒ヶ岳SA（上り）</div><p>中央アルプスのふもと。眠気があれば追加の休憩に。</p><div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>恵那峡と諏訪湖の中間にあり、眠気が出たときの追加休憩に</li><li>中央アルプスのふもとで景色がいい</li></ul></div><div class="btns"><a class="btn" data-q="駒ヶ岳サービスエリア 上り">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body"><div class="name">諏訪湖SA（上り）</div><p>諏訪湖を望む高台のSA。中央道を岡谷JCTより先へ進んだ位置にあるため、A・Bの経路上にない可能性が高い（当日のナビで確認）。</p><div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>諏訪湖を見下ろす眺めで、昼食をとるのに一番向く</li><li>上田までの最後の大きな休憩ポイント</li></ul></div><div class="btns"><a class="btn" data-q="諏訪湖サービスエリア 上り">📍 地図</a></div></div></div>
+</div>
+<p class="small">各SAの飲食店舗・営業時間は当日のNEXCO中日本の案内で確認してください。</p>
+</details>
+</section>
+
+<!-- ===== DAY 3 ===== -->
+<section id="day3">
+<h2>5. DAY 3｜11月3日（火・祝） 上田 → 横浜 → 東京</h2>
+<div class="alert"><strong>13:00 到着は絶対条件。</strong>Earthboat 06:00 出発、休憩2回（＋必要なら1回）。休憩は削らず、遅れたときは<strong>出発を早めることで</strong>余裕を作る。</div>
+
+<details class="cands" id="d3-check"><summary><span class="sum-t">11/3 移動計画の検証（上田 → Kアリーナ横浜）</span><span class="sum-h">タップで開く</span></summary>
+<p class="small">ルート：地蔵峠 → 上田菅平IC → 上信越道 → 藤岡JCT → 関越道 → 鶴ヶ島JCT → 圏央道 → 海老名JCT → 東名 → 横浜町田IC → 保土ヶ谷BP・首都高 → みなとみらい。距離・時間は概算の目安で、当日のナビ表示を優先。</p>
+<div class="scroll"><table>
+<tr><th>区間</th><th>通常時の目安</th><th>祝日・余裕込み</th><th>注意点</th></tr>
+<tr><td>Earthboat → 上田菅平IC（山道）</td><td>25分</td><td>35分</td><td>夜明け前後で暗い。標高約1,000mのため路面凍結に注意してゆっくり</td></tr>
+<tr><td>上田菅平IC → 藤岡JCT（上信越道）</td><td>65分</td><td>75分</td><td>朝の上りは比較的すいている時間帯</td></tr>
+<tr><td>藤岡JCT → 鶴ヶ島JCT（関越道）</td><td>35分</td><td>50分</td><td>関越上りは朝6〜8時台にも渋滞が起きやすい傾向（NEXCO東日本）</td></tr>
+<tr><td>鶴ヶ島JCT → 海老名JCT（圏央道）</td><td>50分</td><td>75分</td><td>休日は八王子JCT付近が混みやすい</td></tr>
+<tr><td>海老名JCT → みなとみらい（東名・保土ヶ谷BP・首都高）</td><td>35分</td><td>60分</td><td>祝日のみなとみらい周辺の一般道・駐車場待ち</td></tr>
+<tr><td>休憩（横川SA・高坂SA）</td><td>40分</td><td>50分</td><td>削らない。眠ければ追加</td></tr>
+<tr><td>入庫・会場まで徒歩</td><td>15分</td><td>35分</td><td>駐車場の場所による</td></tr>
+<tr><th>合計（06:00発）</th><th>約4時間25分 → <span class="verdict-ok">10:25着</span></th><th>約6時間10分 → <span class="verdict-ok">12:10着</span></th><th>13:00まで最低約50分の予備</th></tr>
+</table></div>
+<div class="okbox"><strong>判断：06:00出発で妥当。</strong>渋滞を大きめに見ても目標の12:00〜12:30に収まり、13:00に対して約50分の予備がある。これ以上早めると暗い山道と睡眠不足のリスクが増えるため、通常は06:00を維持。<br><strong>例外：</strong>前夜または当朝のGoogleマップ／NEXCO（ドラとら）で、通常より<strong>90分以上の遅れ</strong>が見込まれる場合は<strong>05:30出発</strong>に繰り上げ。</div>
+<div class="note"><strong>チェックポイント（ここを過ぎていれば順調）</strong><br>横川SA 07:30まで → 高坂SA 08:45まで → 海老名JCT 10:15まで。<br>高坂SA時点で30分以上遅れていたら、ナビの到着予想を確認し、別ルート（関越 → 外環 → 首都高）も比較。休憩は削らない。</div>
+
+</details>
+
+<ul class="tl">
+<li><div class="t">05:15</div><div class="ttl">起床・最終片付け</div><div class="m">荷物は前夜に積み込み済みにしておく。朝食は車内で。</div></li>
+<li><div class="t">05:50</div><div class="ttl">退出・鍵返却</div><div class="m">チェックアウト10:00より前の退出方法・鍵の返却方法を<strong>事前にEarthboatへ確認</strong>（<a href="#todo">出発前にやること</a>）。</div></li>
+<li class="drive key"><div class="t">06:00</div><div class="ttl">Earthboat 出発</div><div class="m">地蔵峠の下り坂は暗く冷える。凍結・動物の飛び出しに注意。</div>
+  <div class="btns"><a class="btn route" data-dest="Kアリーナ横浜 横浜市西区みなとみらい6-2-14">🚗 Kアリーナへのルート</a><a class="btn cal" data-cal='{"t":"Earthboat出発（横浜へ・13時厳守）","s":"2026-11-03T06:00","e":"2026-11-03T06:30","l":"Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183","d":"上信越道→関越道→圏央道→東名。13:00到着厳守。遅れが90分以上見込みなら5:30発"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">07:05<br>〜07:25</div><div class="ttl">休憩① 横川SA（上り）</div><div class="m">運転交代・トイレ。</div>
+  <div class="btns"><a class="btn" data-q="横川サービスエリア 上り">📍 地図</a><a class="btn cal" data-cal='{"t":"休憩① 横川SA（上り）","s":"2026-11-03T07:05","e":"2026-11-03T07:25","l":"横川サービスエリア 上り","d":"7:30までに到着していれば順調"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">08:20<br>〜08:40</div><div class="ttl">休憩② 高坂SA（上り）</div><div class="m">運転交代・トイレ。ここで渋滞状況と到着予想を確認。</div>
+  <div class="btns"><a class="btn" data-q="高坂サービスエリア 上り">📍 地図</a><a class="btn cal" data-cal='{"t":"休憩② 高坂SA（上り）","s":"2026-11-03T08:20","e":"2026-11-03T08:40","l":"高坂サービスエリア 上り","d":"8:45までに到着していれば順調"}'>📅 カレンダー</a></div></li>
+<li class="drive"><div class="t">（必要時）</div><div class="ttl">追加休憩 圏央道 狭山PA／東名 海老名SA（上り）</div><div class="m">眠気・渋滞による疲れがあれば迷わず入る。</div>
+  <div class="btns"><a class="btn" data-q="狭山パーキングエリア 圏央道">📍 狭山PA</a><a class="btn" data-q="EXPASA海老名 上り">📍 海老名SA上り</a></div></li>
+<li class="key"><div class="t">10:30<br>〜12:10</div><div class="ttl">横浜着・駐車場に入庫（目標12:00〜12:30／期限13:00）</div><div class="m">確保した駐車場へ直行。早く着いた分は余裕として使う。</div>
+  <div class="btns"><a class="btn route" data-dest="Kアリーナ横浜 横浜市西区みなとみらい6-2-14">🚗 ルート</a><a class="btn cal" data-cal='{"t":"横浜着・駐車（期限13:00）","s":"2026-11-03T10:30","e":"2026-11-03T12:30","l":"Kアリーナ横浜 横浜市西区みなとみらい6-2-14","d":"目標12:00-12:30、期限13:00"}'>📅 カレンダー</a></div></li>
+<li><div class="t">〜15:00</div><div class="ttl">昼食・休憩（車内仮眠もおすすめ）</div><div class="m">夜の運転に備え、ここで30分ほど仮眠しておく。開場前のトイレは会場外周にあり（Kアリーナ公式）。</div></li>
+<li class="key"><div class="t">15:30<br>17:00</div><div class="ttl">Kvi Baba LIVE（開場15:30／開演17:00）</div><div class="m">終演時刻は<strong>未発表</strong>のため、ここでは決めない。終演後は規制退場あり（Kアリーナ公式）。館内の支払いはキャッシュレスのみ。</div>
+  <div class="btns"><a class="btn" data-q="Kアリーナ横浜 横浜市西区みなとみらい6-2-14">📍 地図</a><a class="btn cal" data-cal='{"t":"Kvi Baba LIVE（開場15:30・開演17:00・終演未定）","s":"2026-11-03T15:30","e":"2026-11-03T17:00","l":"Kアリーナ横浜 横浜市西区みなとみらい6-2-14","d":"終了時刻は未定のため、この予定の終了時刻は開演時刻にしています"}'>📅 カレンダー</a></div></li>
+<li><div class="t">終演後</div><div class="ttl">温泉・サウナ 約2時間 → 東京へ</div><div class="m">時刻は終演次第。下の<a href="#after-calc">終演後の時刻計算</a>で確認。</div>
+  <div class="btns"><span class="btn na">📅 時刻未定のため登録なし</span></div></li>
+</ul>
+
+<h3 id="parking">Kアリーナ周辺の駐車場｜今日中に確保</h3>
+<div class="alert"><strong>公式駐車場P1は、公演日は予約車専用（予約なしでは入れない）。</strong>予約は公演日の1か月前から、営業7:00〜23:00で<strong>23:00〜翌7:00は入出庫不可</strong>（Kアリーナ公式FAQ）。チケット完売の公演のため、空きがなければ予約制の民間駐車場（akippa・特P）を<strong>出発前に</strong>押さえる。</div>
+<div class="grid">
+  <div class="card rec"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://k-arena.com/wp-content/themes/k-arena/assets/images/ogp.png" alt="Kアリーナ横浜 公式サイトの画像" onerror="imgFail(this)"><div class="cap">出典：Kアリーナ横浜 公式サイト（駐車場の写真ではありません）</div></div><div class="body">
+    <div class="name">ミュージックテラス駐車場 P1（会場公式）</div>
+    <dl><dt>条件</dt><dd>公演日は予約制（Times予約）／7:00〜23:00</dd><dt>距離</dt><dd>会場に隣接（終演後はノースゲート階段から）</dd></dl>
+    <p>最も近く確実。23時以降は出庫できないので、温泉へ移動する前提なら問題なし。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>会場に隣接していて、駐車場から歩く距離がほぼない</li><li>予約制なので、当日確実に停められる</li><li>出庫は23:00までだが、終演後すぐ温泉へ移動するなら問題ない</li></ul></div><div class="btns"><a class="btn" href="https://www.timesclub.jp/reserve/parking/detail/0000010.html" target="_blank" rel="noopener">🅿 Times予約ページ</a><a class="btn" href="https://k-arena.com/faq/#parking" target="_blank" rel="noopener">公式FAQ</a><a class="btn" data-q="ミュージックテラス駐車場 Kアリーナ横浜">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">予約制の民間駐車場（akippa・特P）</div>
+    <dl><dt>条件</dt><dd>事前予約・料金は各サイト</dd></dl>
+    <p>P1が取れない場合の本命。<strong>車（全長4.26m・全幅1.70m・全高約1.7m）が入る</strong>こと、<strong>出庫可能時間が23:00以降または24時間</strong>であることを確認して予約。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>事前予約で、当日満車になる心配がない</li><li>24時間出庫できる場所を選べば、終演時刻を気にしなくていい</li></ul></div><div class="btns"><a class="btn" href="https://www.akippa.com/kanto/kanagawa/karenayokohama" target="_blank" rel="noopener">akippa（Kアリーナ周辺）</a><a class="btn" href="https://toku-p.earth-car.com/" target="_blank" rel="noopener">特P</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">横浜グランゲート駐車場</div>
+    <dl><dt>条件</dt><dd>akippa掲載枠：土日祝 9:00〜22:00、機械式・全高2.05m以下枠あり <span class="badge b-chk">要確認</span></dd></dl>
+    <p>会場の徒歩圏。<strong>22:00で出庫できなくなる枠</strong>があるため、終演が遅い場合は注意。全高1.55m以下の枠にはこの車は入らない。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>会場から歩いて行ける距離</li><li>akippaで予約できる枠がある</li></ul></div><div class="btns"><a class="btn" data-q="横浜グランゲート 駐車場">📍 地図</a></div></div></div>
+  <div class="card"><div class="noph">公式サイトの写真なし<br>写真は📍地図（Googleマップの施設ページ）で確認</div><div class="body">
+    <div class="name">オーケーみなとみらいビル駐車場</div>
+    <dl><dt>条件</dt><dd>555台・24時間（過去情報）<span class="badge b-chk">要確認</span></dd></dl>
+    <p>台数は多いが、イベント日は満車リスクが高い。商業施設の駐車場なので利用条件を守る。</p>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>555台と台数が多い（過去情報）</li></ul></div><div class="btns"><a class="btn" data-q="オーケーみなとみらいビル 駐車場">📍 地図</a></div></div></div>
+</div>
+
+<details class="cands" id="after-spa"><summary><span class="sum-t">ライブ後の温泉・サウナ候補（3施設）</span><span class="sum-h">タップで開く</span></summary><p class="small" style="margin:6px 0 0">ライブ後の温泉・サウナ（約2時間）</p>
+<p>終演時刻が未定のため、<strong>遅くまで入れて設備が充実し、帰り道の途中にある「RAKU SPA 鶴見」を第一候補</strong>にしました。終演が早ければ会場に最も近い RAKU SPA BAY 横浜も選べます。</p>
+<div class="grid">
+  <div class="card rec"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://rakuspa.com/tsurumi/assets/img/ogp_2020.jpg" alt="RAKU SPA 鶴見" onerror="imgFail(this)"><div class="cap">出典：RAKU SPA 鶴見 公式サイト</div></div><div class="body">
+    <div class="name">RAKU SPA 鶴見 <span class="badge b-rec">第一候補</span></div>
+    <dl><dt>住所</dt><dd>横浜市鶴見区元宮2-1-39</dd>
+    <dt>祝日</dt><dd><strong>10:00〜翌2:00（最終受付 翌1:00）</strong>※翌2:00以降は風呂・岩盤浴不可（公式）</dd>
+    <dt>設備</dt><dd>15種類の風呂とサウナ、6種類の岩盤浴、コミック2万冊以上、200種類以上の食事メニュー（公式）</dd>
+    <dt>料金</dt><dd>一般大人 土日祝2,880円。<strong>夜割（21:00〜）1,980円</strong>、翌2:00以降は深夜追加+1,980円 ※確認済</dd>
+    <dt>駐車場</dt><dd>無料・約292台 ※確認済</dd>
+    <dt>移動</dt><dd>Kアリーナから車で約20〜30分（目安）。東京方面への帰り道の途中</dd></dl>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>祝日も翌1:00まで受付で、終演時刻が読めなくても入れる可能性が一番高い</li><li>15種類の風呂とサウナ、6種類の岩盤浴で、3候補の中で設備が一番充実</li><li>東京方面への帰り道の途中にあり、遠回りが少ない</li><li>21:00以降は夜割1,980円、駐車場は無料・約292台</li></ul></div><div class="btns"><a class="btn route" data-dest="RAKU SPA 鶴見 横浜市鶴見区元宮2-1-39">🚗 ルート</a><a class="btn" href="https://rakuspa.com/tsurumi/" target="_blank" rel="noopener">公式</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://rakuspa.com/yokohama/assets/img/ogp_2020.jpg" alt="RAKU SPA BAY 横浜" onerror="imgFail(this)"><div class="cap">出典：RAKU SPA BAY 横浜 公式サイト</div></div><div class="body">
+    <div class="name">RAKU SPA BAY 横浜 <span class="badge b-cand">終演が早い場合</span></div>
+    <dl><dt>住所</dt><dd>横浜市神奈川区山内町15-2</dd>
+    <dt>祝日</dt><dd><strong>10:00〜23:00（最終受付22:00）</strong>（公式）。2時間滞在するには<strong>21:00までに入館</strong></dd>
+    <dt>設備</dt><dd>黄金色の天然温泉（内湯・外湯）、サウナ、岩盤浴、オーシャンビューの展望テラス、コミック1万冊</dd>
+    <dt>料金</dt><dd>土日祝 大人2,080円＋入湯税100円（公式）</dd>
+    <dt>駐車場</dt><dd>約200台、6時間まで2時間ごと150円、高さ2.1m以上不可（公式）</dd>
+    <dt>移動</dt><dd>会場から最も近い（首都高 東神奈川出口から約5分）</dd></dl>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>会場から一番近く、移動時間が短い</li><li>海とみなとみらいを望む展望テラスと天然温泉</li><li>ただし祝日の最終受付は22:00なので、終演が早いとき向け</li></ul></div><div class="btns"><a class="btn route" data-dest="RAKU SPA BAY 横浜 横浜市神奈川区山内町15-2">🚗 ルート</a><a class="btn" href="https://rakuspa.com/yokohama/access/" target="_blank" rel="noopener">公式</a></div></div></div>
+  <div class="card"><div class="ph"><img loading="lazy" referrerpolicy="no-referrer" src="https://www.libur.co.jp/wp-content/themes/libur/images/top/top_hero01_sp.jpg" alt="スパ・リブール ヨコハマ" onerror="imgFail(this)"><div class="cap">出典：スパ・リブール ヨコハマ 公式サイト</div></div><div class="body">
+    <div class="name">スパ・リブール ヨコハマ <span class="badge b-cand">終演がかなり遅い場合</span></div>
+    <dl><dt>住所</dt><dd>横浜市鶴見区獅子ヶ谷2-39-18</dd>
+    <dt>営業</dt><dd><strong>10:00〜翌8:00、年中無休</strong>。岩盤浴は深夜2時まで（公式）</dd>
+    <dt>設備</dt><dd>獅子ヶ谷源泉の黒湯、露天風呂、サウナ、岩盤浴、レストラン（LO 日〜木・祝はフード22:00）</dd>
+    <dt>料金</dt><dd>土日祝 大人1,750円（公式）</dd>
+    <dt>駐車場</dt><dd>無料・約70台 ※確認済</dd></dl>
+    <div class="rec-pts"><div class="rec-h">おすすめポイント</div><ul><li>翌8:00まで営業で、終演が大きく遅れても入れる</li><li>黒湯の源泉と露天風呂で、サウナ後の外気浴が人気</li><li>駐車場は無料・約70台</li></ul></div><div class="btns"><a class="btn route" data-dest="スパ・リブール ヨコハマ 横浜市鶴見区獅子ヶ谷2-39-18">🚗 ルート</a><a class="btn" href="https://www.libur.co.jp/access-car/" target="_blank" rel="noopener">公式（車）</a></div></div></div>
+</div>
+<p class="small">参考：横浜天然温泉 SPA EAS（横浜駅近く）は 9:30〜23:00（最終入館22:00、浴室は22:30まで）※確認済。BAY横浜と同様に終演が早い場合のみの選択肢（駐車場の利用時間は要確認）。<a data-q="横浜天然温泉 SPA EAS">地図</a></p>
+
+</details>
+<h3 id="after-calc">終演後の時刻計算（終演時刻を入れると目安が出ます）</h3>
+<div class="calc">
+  <label for="endTime"><strong>終演時刻：</strong></label>
+  <input type="time" id="endTime" step="300">
+  <p class="small">仮定：規制退場＋出庫に50分、会場→RAKU SPA 鶴見 30分（BAYは15分）、滞在120分、鶴見→都内 40分。当日の状況で前後します。</p>
+  <div id="calcOut" class="small">終演時刻を入力すると表示します（終演時刻は事前に決めていません）。</div>
+</div>
+
+<h3>帰路と疲労対策</h3>
+<div class="okbox">
+<ul style="margin:0;padding-left:1.2em">
+<li>この日は05:15起床で、帰宅は日付が変わる見込み。<strong>翌日は仕事なので、温泉を短くする判断もあり</strong>（例：終演が21時を過ぎたら滞在を60〜90分に）。</li>
+<li><strong>温泉での飲酒は、この後に運転する人は不可。</strong></li>
+<li>おすすめの分担：次に運転する人は温泉の休憩スペースで20〜30分仮眠してから運転を交代。</li>
+<li>途中で眠気を感じたら、すぐに走り出さず仮眠してから出発。<strong>眠いまま運転を続けない。</strong></li>
+</ul>
+</div>
+</section>
+
+
+
+
+
+
+
+<!-- ===== 実用情報 ===== -->
+<section id="info">
+<h2>6. 実用情報・参考リンク</h2>
+<h3>実用メモ</h3>
+<ul>
+<li><strong>道路状況：</strong>出発前と休憩ごとにGoogleマップの到着予想を確認。<a href="https://www.driveplaza.com/traffic/" target="_blank" rel="noopener">ドラぷら（NEXCO東日本）交通情報</a>／<a href="https://www.c-ihighway.jp/" target="_blank" rel="noopener">iHighway（NEXCO中日本）</a></li>
+<li><strong>気温：</strong>Earthboat付近は標高約1,000m。11月初旬の朝晩は冷え込み、0℃前後になることも。防寒着を手の届く所に。</li>
+<li><strong>Kアリーナ：</strong>館内のバー・売店は現金不可（キャッシュレスのみ）。コインロッカーは現金のみ。飲食物の持ち込み不可（公式FAQ）。</li>
+<li><strong>時刻表記：</strong>このしおりの時刻は計画用の目安。渋滞・天候・休憩・駐車待ちで変わる。</li>
+<li><strong>写真について：</strong>写真は各公式サイト（公式がない場合は名古屋市観光公式）の画像を直接参照しています。公式サイトに写真がない施設は「公式サイトの写真なし」と表示し、📍地図ボタンからGoogleマップの施設ページで写真を確認できます。</li>
+</ul>
+
+<h3>情報源（主に公式）</h3>
+<ol class="src">
+<li><a href="https://k-arena.com/faq/" target="_blank" rel="noopener">Kアリーナ横浜 公式FAQ（駐車場P1：公演日は予約制・7:00〜23:00、規制退場、キャッシュレス）</a></li>
+<li><a href="https://www.sakigake.jp/news/article/20260827OR0203/" target="_blank" rel="noopener">ORICON NEWS配信：Kvi Baba 11/3 Kアリーナ横浜公演の発表</a></li>
+<li><a href="https://rakuspa.com/tsurumi/" target="_blank" rel="noopener">RAKU SPA 鶴見 公式（祝日 翌2:00まで・最終受付 翌1:00、設備）</a></li>
+<li><a href="https://rakuspa.com/yokohama/access/" target="_blank" rel="noopener">RAKU SPA BAY 横浜 公式（祝日 23:00まで・最終受付22:00、料金、駐車場）</a></li>
+<li><a href="https://www.libur.co.jp/" target="_blank" rel="noopener">スパ・リブール ヨコハマ 公式（10:00〜翌8:00、料金）</a></li>
+<li><a href="https://earthboat.jp/qa" target="_blank" rel="noopener">Earthboat 公式Q&amp;A（IN15:00／OUT10:00、設備、持ち込み）</a></li>
+<li><a href="https://www.walkerplus.com/article/1442627/" target="_blank" rel="noopener">Walkerplus：Earthboat Ueda Onsen 試泊レポ（上田菅平ICから約25分）</a></li>
+<li><a href="https://www.nagoya-info.jp/accommodation/detail/127/" target="_blank" rel="noopener">名古屋市観光公式：ザ ロイヤルパークホテル アイコニック 名古屋（中日ビル地下駐車場）</a></li>
+<li><a href="https://www.nagoya-info.jp/spot/detail/11/" target="_blank" rel="noopener">名古屋市観光公式：熱田神宮</a></li>
+<li><a href="https://www.nagoya-info.jp/gourmet/detail/100/" target="_blank" rel="noopener">名古屋市観光公式：すゞ家 赤門店（木曜定休）</a></li>
+<li><a href="https://tabelog.com/aichi/A2301/A230103/23006305/" target="_blank" rel="noopener">食べログ：加藤珈琲店（8:00〜16:00、水曜定休）</a></li>
+<li><a href="https://www.gltjp.com/ja/directory/item/13486/" target="_blank" rel="noopener">GLTJP：洋菓子・喫茶ボンボン（8:00〜21:00、無休）</a></li>
+<li><a href="https://www.gltjp.com/ja/directory/item/14771/" target="_blank" rel="noopener">GLTJP：昔の矢場とん（11:00〜21:00、無休）</a></li>
+<li><a href="https://www.city.ueda.nagano.jp/soshiki/nosanmarket/1193.html" target="_blank" rel="noopener">上田市公式：新鮮市真田</a></li>
+<li><a href="https://www.seiyu.co.jp/shop/%E8%A5%BF%E5%8F%8B%E7%9C%9F%E7%94%B0%E5%BA%97/" target="_blank" rel="noopener">西友 真田店 公式</a></li>
+<li><a href="https://www.driveplaza.com/trip/area/kanto/traffic/kanetsu/" target="_blank" rel="noopener">NEXCO東日本：関越道の渋滞傾向・AI渋滞予知</a></li>
+</ol>
+</section>
+
+<footer>作成：2026年10月31日｜旅程計画用のしおりです。営業時間・料金・駐車条件・道路状況は変わることがあるため、出発前と当日に各公式案内・ナビで再確認してください。「要確認」は最新情報を確認できなかった項目です。</footer>
+</main>
+
+<nav class="bnav" aria-label="クイックナビ">
+  <a href="#top">TOP</a><a href="#prep">準備</a><a href="#day1">DAY1</a><a href="#day2">DAY2</a><a href="#day3">DAY3</a><a href="#info">情報</a>
+</nav>
+
+<script>
+(function(){
+  var E = encodeURIComponent;
+  function pad(n){return (n<10?'0':'')+n;}
+  function gdate(s){ // "2026-11-01T02:00" -> 20261101T020000
+    return s.replace(/-/g,'').replace(':','') + '00';
+  }
+  // Googleカレンダー
+  document.querySelectorAll('[data-cal]').forEach(function(a){
+    try{
+      var c = JSON.parse(a.getAttribute('data-cal'));
+      var url = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+        + '&text=' + E(c.t)
+        + '&dates=' + gdate(c.s) + '/' + gdate(c.e)
+        + '&ctz=Asia/Tokyo'
+        + (c.l ? '&location=' + E(c.l) : '')
+        + (c.d ? '&details=' + E(c.d + '\n（名古屋・上田・横浜 旅のしおり）') : '');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    }catch(e){ a.classList.add('na'); a.textContent = 'カレンダー情報エラー'; }
+  });
+  // 現在地からの車ルート（確定した目的地）
+  document.querySelectorAll('[data-dest]').forEach(function(a){
+    a.href = 'https://www.google.com/maps/dir/?api=1&destination=' + E(a.getAttribute('data-dest')) + '&travelmode=driving';
+    a.target = '_blank'; a.rel = 'noopener';
+  });
+  // 施設検索（候補）
+  document.querySelectorAll('[data-q]').forEach(function(a){
+    a.href = 'https://www.google.com/maps/search/?api=1&query=' + E(a.getAttribute('data-q'));
+    a.target = '_blank'; a.rel = 'noopener';
+  });
+  // 写真（Google画像検索）
+  document.querySelectorAll('[data-photo]').forEach(function(a){
+    a.href = 'https://www.google.com/search?tbm=isch&q=' + E(a.getAttribute('data-photo'));
+    a.target = '_blank'; a.rel = 'noopener';
+  });
+  // 区間ルート（出発地|経由地|目的地）
+  document.querySelectorAll('[data-leg]').forEach(function(a){
+    var p = a.getAttribute('data-leg').split('|');
+    var url = 'https://www.google.com/maps/dir/?api=1&origin=' + E(p[0]) + '&destination=' + E(p[p.length-1]) + '&travelmode=driving';
+    if(p.length > 2){ url += '&waypoints=' + E(p.slice(1,-1).join('|')); }
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+  });
+  // 全行程
+  var stops = ['東京駅','中日ビル 名古屋市中区栄4-1-1','Earthboat Ueda Onsen 長野県上田市真田町傍陽9097-183','Kアリーナ横浜 横浜市西区みなとみらい6-2-14','東京駅'];
+  document.getElementById('fullRoute').href = 'https://www.google.com/maps/dir/' + stops.map(E).join('/') + '/';
+  document.getElementById('fullRoute2').href = document.getElementById('fullRoute').href;
+
+
+
+  function showPlan(pl,save){
+    document.querySelectorAll('.plan-panel').forEach(function(x){ x.hidden = x.getAttribute('data-plan')!==pl; });
+    document.querySelectorAll('.ptab').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-plan')===pl ? 'true':'false'); });
+    if(save){ try{ localStorage.setItem('trip2026_day2plan',pl); }catch(_){} }
+  }
+  var savedPlan='a'; try{ savedPlan=localStorage.getItem('trip2026_day2plan')||'a'; }catch(_){}
+  showPlan(savedPlan,false);
+  document.querySelectorAll('.ptab').forEach(function(b){ b.addEventListener('click',function(){ showPlan(b.getAttribute('data-plan'),true); }); });
+  function openTo(id){
+    var t=document.getElementById(id); if(!t) return;
+    var pp=t.classList.contains('plan-panel')?t:t.closest('.plan-panel'); if(pp){ showPlan(pp.getAttribute('data-plan'),true); }
+    var d=t.closest('details'); if(d) d.open=true;
+    if(t.tagName==='DETAILS') t.open=true;
+    setTimeout(function(){ t.scrollIntoView({behavior:'smooth',block:'start'}); },30);
+  }
+  document.addEventListener('click',function(e){
+    var a=e.target.closest('a[href^="#"]'); if(!a) return;
+    var id=a.getAttribute('href').slice(1); if(!id) return;
+    var t=document.getElementById(id); if(!t) return;
+    e.preventDefault(); openTo(id);
+    try{ history.replaceState(null,'','#'+id); }catch(_){}
+  });
+  if(location.hash){ openTo(location.hash.slice(1)); }
+  // チェックリスト（完了へ移動＋保存）
+  var KEY = 'trip2026nagoya_checklist_v1';
+  var state = {};
+  try{ state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }catch(e){ state = {}; }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  document.querySelectorAll('.checklist').forEach(function(box){
+    var doneUl = box.querySelector('ul.done');
+    var cnt = box.querySelector('.dcount');
+    box.querySelectorAll('ul.cl:not(.done) li').forEach(function(li){
+      var id = li.getAttribute('data-id');
+      li.setAttribute('data-home', li.parentNode.getAttribute('data-group'));
+      li._home = li.parentNode;
+      li._next = null;
+      var html = li.innerHTML;
+      li.innerHTML = '';
+      var cb = document.createElement('input'); cb.type='checkbox'; cb.id='cb_'+id;
+      var lb = document.createElement('label'); lb.htmlFor='cb_'+id; lb.innerHTML = html;
+      li.appendChild(cb); li.appendChild(lb);
+      li._order = Array.prototype.indexOf.call(li._home.children, li);
+      cb.addEventListener('change', function(){ state[id] = cb.checked; save(); place(li, cb.checked); update(); });
+    });
+    function place(li, done){
+      if(done){ doneUl.appendChild(li); }
+      else{
+        var home = li._home, kids = Array.prototype.slice.call(home.children), ins = null;
+        for(var i=0;i<kids.length;i++){ if(kids[i]._order > li._order){ ins = kids[i]; break; } }
+        home.insertBefore(li, ins);
+      }
+    }
+    function update(){ cnt.textContent = doneUl.children.length; }
+    box.querySelectorAll('ul.cl:not(.done) li').forEach(function(li){
+      var id = li.getAttribute('data-id');
+      if(state[id]){ li.querySelector('input').checked = true; place(li, true); }
+    });
+    update();
+  });
+
+  // 終演後の計算
+  var inp = document.getElementById('endTime'), out = document.getElementById('calcOut');
+  function fmt(m){ m = ((m%1440)+1440)%1440; return pad(Math.floor(m/60)) + ':' + pad(m%60); }
+  function nextDay(m){ return m>=1440 ? '（翌）' : ''; }
+  function calc(){
+    if(!inp.value){ out.textContent='終演時刻を入力すると表示します（終演時刻は事前に決めていません）。'; return; }
+    var hm = inp.value.split(':'), end = (+hm[0])*60 + (+hm[1]);
+    if(end < 600) end += 1440; // 深夜入力は翌日扱い
+    var exitP = end + 50;
+    // RAKU SPA 鶴見
+    var tsArr = exitP + 30, tsLimitEntry = 1440 + 60, tsBathEnd = 1440 + 120;
+    var tsStay = Math.min(120, tsBathEnd - tsArr);
+    var tsOut = tsArr + Math.max(tsStay,0);
+    var yushima = tsOut + 40, fushimi = yushima;
+    // RAKU SPA BAY
+    var bayArr = exitP + 15, bayStay = Math.min(120, 1380 - bayArr);
+    var bayV;
+    if(bayArr <= 1260) bayV = '<span class="verdict-ok">2時間滞在できる</span>';
+    else if(bayArr <= 1320) bayV = '<span class="verdict-mid">入館できるが滞在は約' + Math.max(bayStay,0) + '分まで</span>';
+    else bayV = '<span class="verdict-ng">最終受付（22:00）に間に合わない</span>';
+    var tsV;
+    if(tsArr > tsLimitEntry) tsV = '<span class="verdict-ng">最終受付（翌1:00）に間に合わない → スパ・リブール（翌8:00まで）へ</span>';
+    else if(tsStay < 120) tsV = '<span class="verdict-mid">入館できるが風呂は翌2:00まで（約' + tsStay + '分）</span>';
+    else tsV = '<span class="verdict-ok">2時間滞在できる</span>';
+    if(tsArr >= 1260 && tsArr <= tsLimitEntry) tsV += '（夜割1,980円の時間帯）';
+    var advice = '';
+    if(fushimi - end > 0 && end >= 1260) advice = '<p class="verdict-mid">終演が21時以降のため、翌日の仕事を考えて温泉を60〜90分に短縮するのがおすすめ。</p>';
+    out.innerHTML =
+      '<table><tr><td>出庫（目安）</td><td><strong>' + fmt(exitP) + nextDay(exitP) + '</strong></td></tr>'
+      + '<tr><td>RAKU SPA 鶴見 着</td><td><strong>' + fmt(tsArr) + nextDay(tsArr) + '</strong>　' + tsV + '</td></tr>'
+      + (tsArr <= tsLimitEntry ? '<tr><td>退館</td><td>' + fmt(tsOut) + nextDay(tsOut) + '</td></tr>'
+      + '<tr><td>都内 着</td><td><strong>' + fmt(yushima) + nextDay(yushima) + '</strong></td></tr>' : '')
+      + '<tr><td>（参考）BAY 横浜</td><td>' + fmt(bayArr) + nextDay(bayArr) + ' 着　' + bayV + '</td></tr></table>' + advice
+      + '<p class="small">眠気があれば、この時刻にこだわらず仮眠・休憩を優先。</p>';
+  }
+  inp.addEventListener('input', calc); inp.addEventListener('change', calc);
+})();
+</script>
+</body>
+</html>
