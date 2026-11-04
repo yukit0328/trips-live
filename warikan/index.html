@@ -70,6 +70,8 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+.checks label.all-chip{border-color:var(--accent);font-weight:700;color:var(--accent)}
+.all-on #fParts label{opacity:.45}
 label.fixed{display:flex;align-items:flex-start;gap:8px;font-weight:400;font-size:14px;background:var(--warn-bg);border:1px solid #f0d9a6;border-radius:10px;padding:10px 12px;margin-top:10px}
 label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-color:var(--accent)}
 .overlay{position:fixed;inset:0;background:rgba(23,33,43,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
@@ -125,11 +127,10 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
       </div>
       <label for="fPayer">払った人</label>
       <select id="fPayer" required></select>
-      <label>誰の分か <button type="button" class="linkbtn" id="allBtn">全員</button></label>
-      <div class="checks" id="fParts"></div>
+      <label>誰の分か <button type="button" class="linkbtn" id="allBtn">今いるメンバーを全員選択</button></label>
+      <div class="checks" id="partsBox"><label class="all-chip"><input type="checkbox" id="fAll" checked>全員</label><span id="fParts" style="display:contents"></span></div>
       <p class="note" id="perHead"></p>
-      <p class="note" id="allNote">全員にチェックした支払いは、あとからメンバーを追加するとその人も含めて割り直します。</p>
-      <label class="fixed hidden" id="fixedWrap"><input type="checkbox" id="fFixed">今いるメンバーだけで割る（あとから追加した人は含めない）</label>
+      <p class="note" id="allNote"></p>
       <div class="row" style="margin-top:14px">
         <button type="submit" id="saveBtn">追加する</button>
         <button type="button" class="sub shrink hidden" id="cancelEdit">やめる</button>
@@ -326,21 +327,20 @@ function renderMembers() {
 function renderFormOptions() {
   const prevPayer = $('fPayer').value;
   const prevParts = new Set([...$('fParts').querySelectorAll('input:checked')].map(i => i.value));
-  const fresh = !$('fParts').children.length || $('fParts').dataset.sig !== members.map(m => m.id).join();
   const me = lsGet(meKey());
   $('fPayer').innerHTML = members.map(m => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');
   $('fPayer').value = members.some(m => m.id === prevPayer) ? prevPayer : (members.some(m => m.id === me) ? me : (members[0]?.id ?? ''));
-  $('fParts').innerHTML = members.map(m => `<label><input type="checkbox" value="${esc(m.id)}" ${fresh || prevParts.has(m.id) ? 'checked' : ''}>${esc(m.name)}</label>`).join('');
+  $('fParts').innerHTML = members.map(m => `<label><input type="checkbox" value="${esc(m.id)}" ${$('fAll').checked || prevParts.has(m.id) ? 'checked' : ''}>${esc(m.name)}</label>`).join('');
   $('fParts').dataset.sig = members.map(m => m.id).join();
   $('saveBtn').disabled = !members.length;
   updatePerHead();
 }
 function updatePerHead() {
   const n = $('fParts').querySelectorAll('input:checked').length, a = parseInt($('fAmount').value, 10);
-  const allChecked = members.length > 0 && n === members.length;
-  $('fixedWrap').classList.toggle('hidden', !allChecked);
-  $('allNote').classList.toggle('hidden', !allChecked || $('fFixed').checked);
-  if (!allChecked) $('fFixed').checked = false;
+  const allOn = $('fAll').checked;
+  $('partsBox').classList.toggle('all-on', allOn);
+  $('allNote').textContent = allOn ? '「全員」は、あとから追加したメンバーも含めて割ります。'
+    : members.length && n === members.length ? '今いるメンバーだけで割ります（あとから追加した人は含めません）。' : '';
   $('perHead').textContent = n && a > 0 ? `${n}人で割って 1人あたり 約${Math.ceil(a / n).toLocaleString('ja-JP')}円` : '';
 }
 
@@ -410,7 +410,7 @@ function startEdit(id) {
   editingId = id;
   $('fTitle').value = e.title; $('fAmount').value = e.amount; $('fDate').value = e.date; $('fPayer').value = e.payer;
   $('fParts').querySelectorAll('input').forEach(i => i.checked = partsOf(e).includes(i.value));
-  $('fFixed').checked = !isAll(e) && e.participants.length === members.length;
+  $('fAll').checked = isAll(e);
   $('formTitle').textContent = '支払いを修正'; $('saveBtn').textContent = '修正を保存'; $('cancelEdit').classList.remove('hidden');
   updatePerHead();
   $('formSec').scrollIntoView();
@@ -419,7 +419,7 @@ function endEdit() {
   editingId = null;
   $('expForm').reset(); $('fDate').value = today();
   $('fParts').querySelectorAll('input').forEach(i => i.checked = true);
-  $('fFixed').checked = false;
+  $('fAll').checked = true;
   $('formTitle').textContent = '支払いを入力'; $('saveBtn').textContent = '追加する'; $('cancelEdit').classList.add('hidden');
   renderFormOptions();
 }
@@ -444,9 +444,10 @@ async function run(p, okMsg) {
 function bindForms() {
   $('fDate').value = today();
   $('fAmount').addEventListener('input', updatePerHead);
-  $('fParts').addEventListener('change', updatePerHead);
-  $('fFixed').addEventListener('change', updatePerHead);
-  $('allBtn').onclick = () => { $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); };
+  // 「全員」がオンのときに個別のメンバーを押したら、「全員」を外してそのメンバーだけ外す
+  $('fParts').addEventListener('change', () => { $('fAll').checked = false; updatePerHead(); });
+  $('fAll').addEventListener('change', () => { if ($('fAll').checked) $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); });
+  $('allBtn').onclick = () => { $('fAll').checked = false; $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); };
   $('cancelEdit').onclick = endEdit;
 
   $('expForm').onsubmit = async ev => {
@@ -457,7 +458,7 @@ function bindForms() {
     if (!(amount >= 1 && amount <= 10000000) || String(amount) !== $('fAmount').value.trim()) return alert('金額は1〜10,000,000の整数で入力してください');
     if (!participants.length) return alert('「誰の分か」を1人以上選んでください');
     const me = lsGet(meKey());
-    const data = { title, amount, payer, participants: participants.length === members.length && !$('fFixed').checked ? [ALL] : participants, date };
+    const data = { title, amount, payer, participants: $('fAll').checked ? [ALL] : participants, date };
     $('saveBtn').disabled = true;
     const ok = editingId
       ? await run(store.updateExpense(editingId, data), '修正しました')
