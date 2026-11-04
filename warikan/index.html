@@ -121,6 +121,7 @@ nav.bottom a:active{background:var(--soft)}
       <label>誰の分か <button type="button" class="linkbtn" id="allBtn">全員</button></label>
       <div class="checks" id="fParts"></div>
       <p class="note" id="perHead"></p>
+      <p class="note">全員にチェックした支払いは、あとからメンバーを追加するとその人も含めて割り直します。</p>
       <div class="row" style="margin-top:14px">
         <button type="submit" id="saveBtn">追加する</button>
         <button type="button" class="sub shrink hidden" id="cancelEdit">やめる</button>
@@ -233,9 +234,13 @@ function localStore(key) {
 }
 
 // ----- 計算 -----
+// participants が ['__all__'] の支払いは「全員の分」。あとから追加したメンバーも含めて割る。
+const ALL = '__all__';
+const isAll = e => e.participants.includes(ALL);
+const partsOf = e => isAll(e) ? members.map(m => m.id) : e.participants;
 // 1人あたりの負担を1円単位で出す。割り切れない端数は、メンバー順で先の人から1円ずつ負担。
 function shares(exp, order) {
-  const parts = [...exp.participants].sort((a, b) => (order[a] ?? 1e9) - (order[b] ?? 1e9));
+  const parts = [...partsOf(exp)].sort((a, b) => (order[a] ?? 1e9) - (order[b] ?? 1e9));
   const n = parts.length, base = Math.floor(exp.amount / n), rem = exp.amount - base * n;
   const out = {};
   parts.forEach((p, i) => { out[p] = base + (i < rem ? 1 : 0); });
@@ -245,7 +250,7 @@ function settle(members, expenses) {
   const order = Object.fromEntries(members.map((m, i) => [m.id, i]));
   const bal = Object.fromEntries(members.map(m => [m.id, { paid: 0, owe: 0 }]));
   for (const e of expenses) {
-    if (!bal[e.payer] || !e.participants.every(p => bal[p])) continue;
+    if (!bal[e.payer] || !partsOf(e).length || !partsOf(e).every(p => bal[p])) continue;
     bal[e.payer].paid += e.amount;
     for (const [p, v] of Object.entries(shares(e, order))) bal[p].owe += v;
   }
@@ -290,7 +295,7 @@ function renderWho() {
 }
 
 function renderMembers() {
-  const used = new Set(expenses.flatMap(e => [e.payer, ...e.participants]));
+  const used = new Set(expenses.flatMap(e => [e.payer, ...(isAll(e) ? [] : e.participants)]));
   $('memberChips').innerHTML = members.length
     ? members.map(m => `<span class="chip">${esc(m.name)}${used.has(m.id) ? '' : `<button data-del="${esc(m.id)}" aria-label="${esc(m.name)}を削除">✕</button>`}</span>`).join('')
     : '<p class="empty">まだメンバーがいません。</p>';
@@ -321,7 +326,7 @@ function renderList() {
   if (!expenses.length) { $('listBody').innerHTML = '<p class="empty">まだ支払いがありません。</p>'; return; }
   const all = members.length;
   $('listBody').innerHTML = expenses.map(e => {
-    const who = e.participants.length === all && members.every(m => e.participants.includes(m.id)) ? '全員' : e.participants.map(nameOf).join('・');
+    const who = isAll(e) ? '全員' : e.participants.map(nameOf).join('・');
     return `<div class="exp">
       <div class="exp-head"><div class="exp-title">${esc(e.title)}</div><div class="exp-amount">${yen(e.amount)}</div></div>
       <div class="exp-meta">${esc(fmtDate(e.date))}　${esc(nameOf(e.payer))} が立て替え ／ ${esc(who)}の分</div>
@@ -382,7 +387,7 @@ function startEdit(id) {
   const e = expenses.find(x => x.id === id); if (!e) return;
   editingId = id;
   $('fTitle').value = e.title; $('fAmount').value = e.amount; $('fDate').value = e.date; $('fPayer').value = e.payer;
-  $('fParts').querySelectorAll('input').forEach(i => i.checked = e.participants.includes(i.value));
+  $('fParts').querySelectorAll('input').forEach(i => i.checked = partsOf(e).includes(i.value));
   $('formTitle').textContent = '支払いを修正'; $('saveBtn').textContent = '修正を保存'; $('cancelEdit').classList.remove('hidden');
   updatePerHead();
   $('formSec').scrollIntoView();
@@ -415,7 +420,7 @@ function bindForms() {
     if (!(amount >= 1 && amount <= 10000000) || String(amount) !== $('fAmount').value.trim()) return alert('金額は1〜10,000,000の整数で入力してください');
     if (!participants.length) return alert('「誰の分か」を1人以上選んでください');
     const me = lsGet(meKey());
-    const data = { title, amount, payer, participants, date };
+    const data = { title, amount, payer, participants: participants.length === members.length ? [ALL] : participants, date };
     $('saveBtn').disabled = true;
     const ok = editingId
       ? await run(store.updateExpense(editingId, data), '修正しました')
