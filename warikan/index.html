@@ -70,6 +70,13 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+label.fixed{display:flex;align-items:flex-start;gap:8px;font-weight:400;font-size:14px;background:var(--warn-bg);border:1px solid #f0d9a6;border-radius:10px;padding:10px 12px;margin-top:10px}
+label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-color:var(--accent)}
+.overlay{position:fixed;inset:0;background:rgba(23,33,43,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.dialog{background:#fff;border-radius:14px;padding:18px;max-width:420px;width:100%;max-height:85vh;overflow:auto}
+.dialog-h{font-weight:800;font-size:17px}
+.dialog-list{font-size:14px;margin:10px 0 0;background:var(--soft);border-radius:10px;padding:8px 12px}
+.tag{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);border:1px solid #f0d9a6;background:var(--warn-bg);border-radius:6px;padding:0 6px;margin-left:4px;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -121,7 +128,8 @@ nav.bottom a:active{background:var(--soft)}
       <label>誰の分か <button type="button" class="linkbtn" id="allBtn">全員</button></label>
       <div class="checks" id="fParts"></div>
       <p class="note" id="perHead"></p>
-      <p class="note">全員にチェックした支払いは、あとからメンバーを追加するとその人も含めて割り直します。</p>
+      <p class="note" id="allNote">全員にチェックした支払いは、あとからメンバーを追加するとその人も含めて割り直します。</p>
+      <label class="fixed hidden" id="fixedWrap"><input type="checkbox" id="fFixed">今いるメンバーだけで割る（あとから追加した人は含めない）</label>
       <div class="row" style="margin-top:14px">
         <button type="submit" id="saveBtn">追加する</button>
         <button type="button" class="sub shrink hidden" id="cancelEdit">やめる</button>
@@ -164,6 +172,16 @@ nav.bottom a:active{background:var(--soft)}
   <a href="#" data-go="memberSec">メンバー</a>
 </nav>
 <div class="toast" id="toast"></div>
+<div class="overlay hidden" id="askAdd">
+  <div class="dialog">
+    <div class="dialog-h" id="askTitle"></div>
+    <p class="note" id="askText" style="margin:6px 0 0"></p>
+    <div class="dialog-list" id="askList"></div>
+    <button id="askYes" class="wide">含める</button>
+    <button id="askNo" class="sub wide" style="margin-top:8px">含めない（これからの支払いだけ）</button>
+    <button id="askCancel" class="linkbtn" style="display:block;margin:12px auto 0">追加をやめる</button>
+  </div>
+</div>
 
 <script type="module">
 // ===== Firebase の設定値（コンソールの firebaseConfig をここに貼る）=====
@@ -319,6 +337,10 @@ function renderFormOptions() {
 }
 function updatePerHead() {
   const n = $('fParts').querySelectorAll('input:checked').length, a = parseInt($('fAmount').value, 10);
+  const allChecked = members.length > 0 && n === members.length;
+  $('fixedWrap').classList.toggle('hidden', !allChecked);
+  $('allNote').classList.toggle('hidden', !allChecked || $('fFixed').checked);
+  if (!allChecked) $('fFixed').checked = false;
   $('perHead').textContent = n && a > 0 ? `${n}人で割って 1人あたり 約${Math.ceil(a / n).toLocaleString('ja-JP')}円` : '';
 }
 
@@ -326,10 +348,10 @@ function renderList() {
   if (!expenses.length) { $('listBody').innerHTML = '<p class="empty">まだ支払いがありません。</p>'; return; }
   const all = members.length;
   $('listBody').innerHTML = expenses.map(e => {
-    const who = isAll(e) ? '全員' : e.participants.map(nameOf).join('・');
+    const who = isAll(e) ? '全員' : esc(e.participants.map(nameOf).join('・')) + (e.participants.length === members.length ? '<span class="tag">追加メンバーは含めない</span>' : '');
     return `<div class="exp">
       <div class="exp-head"><div class="exp-title">${esc(e.title)}</div><div class="exp-amount">${yen(e.amount)}</div></div>
-      <div class="exp-meta">${esc(fmtDate(e.date))}　${esc(nameOf(e.payer))} が立て替え ／ ${esc(who)}の分</div>
+      <div class="exp-meta">${esc(fmtDate(e.date))}　${esc(nameOf(e.payer))} が立て替え ／ ${who}の分</div>
       <div class="exp-meta">入力：${esc(e.createdBy ? nameOf(e.createdBy) : '不明')}</div>
       <div class="exp-actions"><button class="sub small" data-edit="${esc(e.id)}">修正</button><button class="danger small" data-delx="${esc(e.id)}">削除</button></div>
     </div>`;
@@ -388,6 +410,7 @@ function startEdit(id) {
   editingId = id;
   $('fTitle').value = e.title; $('fAmount').value = e.amount; $('fDate').value = e.date; $('fPayer').value = e.payer;
   $('fParts').querySelectorAll('input').forEach(i => i.checked = partsOf(e).includes(i.value));
+  $('fFixed').checked = !isAll(e) && e.participants.length === members.length;
   $('formTitle').textContent = '支払いを修正'; $('saveBtn').textContent = '修正を保存'; $('cancelEdit').classList.remove('hidden');
   updatePerHead();
   $('formSec').scrollIntoView();
@@ -396,8 +419,21 @@ function endEdit() {
   editingId = null;
   $('expForm').reset(); $('fDate').value = today();
   $('fParts').querySelectorAll('input').forEach(i => i.checked = true);
+  $('fFixed').checked = false;
   $('formTitle').textContent = '支払いを入力'; $('saveBtn').textContent = '追加する'; $('cancelEdit').classList.add('hidden');
   renderFormOptions();
+}
+
+// メンバー追加時に、これまでの「全員の分」に含めるかを聞く。'yes' / 'no' / 'cancel' を返す
+function askInclude(name, list) {
+  $('askTitle').textContent = `${name} さんを、これまでの「全員の分」に含めますか？`;
+  $('askText').textContent = `含めると、下の${list.length}件を ${name} さんも入れて割り直します。含めない場合は、今いるメンバーだけの支払いとして残ります。`;
+  $('askList').innerHTML = list.map(e => `${esc(fmtDate(e.date))} ${esc(e.title)} ${yen(e.amount)}`).join('<br>');
+  $('askAdd').classList.remove('hidden');
+  return new Promise(res => {
+    const done = v => { $('askAdd').classList.add('hidden'); res(v); };
+    $('askYes').onclick = () => done('yes'); $('askNo').onclick = () => done('no'); $('askCancel').onclick = () => done('cancel');
+  });
 }
 
 async function run(p, okMsg) {
@@ -409,6 +445,7 @@ function bindForms() {
   $('fDate').value = today();
   $('fAmount').addEventListener('input', updatePerHead);
   $('fParts').addEventListener('change', updatePerHead);
+  $('fFixed').addEventListener('change', updatePerHead);
   $('allBtn').onclick = () => { $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); };
   $('cancelEdit').onclick = endEdit;
 
@@ -420,7 +457,7 @@ function bindForms() {
     if (!(amount >= 1 && amount <= 10000000) || String(amount) !== $('fAmount').value.trim()) return alert('金額は1〜10,000,000の整数で入力してください');
     if (!participants.length) return alert('「誰の分か」を1人以上選んでください');
     const me = lsGet(meKey());
-    const data = { title, amount, payer, participants: participants.length === members.length ? [ALL] : participants, date };
+    const data = { title, amount, payer, participants: participants.length === members.length && !$('fFixed').checked ? [ALL] : participants, date };
     $('saveBtn').disabled = true;
     const ok = editingId
       ? await run(store.updateExpense(editingId, data), '修正しました')
@@ -435,6 +472,16 @@ function bindForms() {
     if (!name) return;
     if (members.some(m => m.name === name)) return alert('同じ名前のメンバーがいます');
     const order = members.reduce((mx, m) => Math.max(mx, m.order ?? 0), 0) + 1;
+    const allExp = expenses.filter(isAll);
+    if (allExp.length) {
+      const ans = await askInclude(name, allExp);
+      if (ans === 'cancel') return;
+      if (ans === 'no') {
+        // これまでの「全員の分」を、今いるメンバーだけの支払いに切り替える
+        const ids = members.map(m => m.id);
+        for (const e of allExp) if (!(await run(store.updateExpense(e.id, { participants: ids })))) return;
+      }
+    }
     if (await run(store.addMember(name, order), `${name} さんを追加しました`)) $('mName').value = '';
   };
 
