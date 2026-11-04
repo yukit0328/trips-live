@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>割り勘・精算</title>
+<style>
+:root{--ink:#17212b;--muted:#5b6875;--line:#d9e0e6;--bg:#f3f6f8;--paper:#fff;--accent:#245a73;--soft:#eaf2f5;--warn-bg:#fff8e8;--warn:#c48a1a;--alert-bg:#fff0ee;--alert:#bd5146;--ok-bg:#ecf7f1;--ok:#1c7c54}
+*{box-sizing:border-box}
+html{scroll-padding-top:12px;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;line-height:1.6;-webkit-text-size-adjust:100%}
+main{max-width:720px;margin:auto;padding:24px max(16px,env(safe-area-inset-left)) 96px max(16px,env(safe-area-inset-right))}
+h1{font-size:24px;margin:0 0 2px}
+.lead{color:var(--muted);margin:0 0 16px;font-size:13px}
+.lead a{color:var(--accent)}
+section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+h2{font-size:16px;color:var(--accent);margin:0 0 10px;letter-spacing:.03em}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.banner{border-radius:12px;padding:12px 14px;font-size:14px;margin:0 0 14px}
+.banner.warn{background:var(--warn-bg);border:1px solid #f0d9a6}
+.banner.alert{background:var(--alert-bg);border:1px solid #f0c5bf}
+.banner.ok{background:var(--ok-bg);border:1px solid #bfe3cf}
+label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+input[type=text],input[type=number],input[type=date],select{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:8px;align-items:flex-end}
+.row>*{flex:1}
+.row>.shrink{flex:0 0 auto}
+button{font:inherit;font-size:15px;font-weight:700;border-radius:10px;padding:10px 14px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer}
+button.sub{background:#fff;color:var(--accent)}
+button.danger{background:#fff;color:var(--alert);border-color:#e3b3ad}
+button.small{font-size:13px;padding:6px 10px}
+button:disabled{opacity:.5;cursor:default}
+.wide{width:100%;margin-top:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 12px;background:var(--soft);font-size:14px}
+.chip button{padding:0 6px;font-size:13px;border:none;background:none;color:var(--muted)}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{display:inline-flex;align-items:center;gap:6px;margin:0;font-weight:400;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:#fff}
+.checks input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.linkbtn{background:none;border:none;color:var(--accent);padding:0;font-size:13px;font-weight:700;text-decoration:underline}
+.exp{border-top:1px solid var(--line);padding:12px 0}
+.exp:first-child{border-top:none;padding-top:0}
+.exp-head{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.exp-title{font-weight:800;font-size:16px;word-break:break-word}
+.exp-amount{font-weight:800;font-size:17px;white-space:nowrap}
+.exp-meta{font-size:13px;color:var(--muted)}
+.exp-actions{display:flex;gap:8px;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}
+th{font-size:12px;color:var(--muted);font-weight:700}
+.plus{color:var(--ok);font-weight:800}
+.minus{color:var(--alert);font-weight:800}
+.transfer{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--soft);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:15px}
+.transfer b{font-size:16px}
+.total{font-size:14px;color:var(--muted);margin:0 0 8px}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.urlbox{font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all;background:var(--soft);border-radius:8px;padding:8px 10px;margin:6px 0}
+.hidden{display:none!important}
+nav.bottom{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px max(8px,env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right));z-index:10}
+nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;padding:6px 2px;border-radius:8px}
+nav.bottom a:active{background:var(--soft)}
+.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:.92}
+</style>
+</head>
+<body>
+<main>
+<h1>割り勘・精算</h1>
+<p class="lead">旅行中の立て替えを記録して、最後に誰が誰にいくら払うかを計算します。<a href="../">しおりに戻る</a></p>
+
+<div id="modeBanner"></div>
+
+<!-- 合言葉がないとき -->
+<section id="noKey" class="hidden">
+  <h2>この旅行の精算ページを作る</h2>
+  <p class="note" style="margin-top:0">URLの合言葉で旅行ごとのデータを分けています。共有されたURLから開いた場合は、URLが途中で切れていないか確認してください。</p>
+  <button id="newKeyBtn" class="wide">新しい精算ページを作る</button>
+</section>
+
+<div id="app" class="hidden">
+  <!-- あなたは誰？ -->
+  <section id="whoSec">
+    <h2>あなたは誰？</h2>
+    <div id="whoBody"></div>
+    <p class="note">選んだ名前はこのスマホ（ブラウザ）に記憶され、入力者として記録されます。</p>
+  </section>
+
+  <!-- 精算結果 -->
+  <section id="resultSec">
+    <h2>精算結果</h2>
+    <div id="resultBody"></div>
+  </section>
+
+  <!-- 支払いの入力 -->
+  <section id="formSec">
+    <h2 id="formTitle">支払いを入力</h2>
+    <form id="expForm" autocomplete="off">
+      <label for="fTitle">内容</label>
+      <input type="text" id="fTitle" maxlength="50" placeholder="例：昼食、ガソリン、駐車場" required>
+      <div class="row">
+        <div>
+          <label for="fAmount">金額（円）</label>
+          <input type="number" id="fAmount" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required>
+        </div>
+        <div>
+          <label for="fDate">日付</label>
+          <input type="date" id="fDate" required>
+        </div>
+      </div>
+      <label for="fPayer">払った人</label>
+      <select id="fPayer" required></select>
+      <label>誰の分か <button type="button" class="linkbtn" id="allBtn">全員</button></label>
+      <div class="checks" id="fParts"></div>
+      <p class="note" id="perHead"></p>
+      <div class="row" style="margin-top:14px">
+        <button type="submit" id="saveBtn">追加する</button>
+        <button type="button" class="sub shrink hidden" id="cancelEdit">やめる</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 一覧 -->
+  <section id="listSec">
+    <h2>支払いの一覧</h2>
+    <div id="listBody"></div>
+  </section>
+
+  <!-- メンバー -->
+  <section id="memberSec">
+    <h2>メンバー</h2>
+    <div class="chips" id="memberChips"></div>
+    <form id="memberForm" class="row" style="margin-top:12px" autocomplete="off">
+      <div><input type="text" id="mName" maxlength="20" placeholder="名前（20文字まで）" required></div>
+      <button type="submit" class="shrink">追加</button>
+    </form>
+    <p class="note">支払いに使われているメンバーは削除できません。</p>
+  </section>
+
+  <!-- 共有 -->
+  <section id="shareSec">
+    <h2>このページを共有する</h2>
+    <p class="note" style="margin-top:0">このURLを知っている人は誰でも見たり書き込んだりできます。旅行メンバー以外には送らないでください。</p>
+    <div class="urlbox" id="shareUrl"></div>
+    <button class="sub" id="copyBtn">URLをコピー</button>
+  </section>
+</div>
+</main>
+
+<nav class="bottom" id="nav">
+  <a href="../">しおり</a>
+  <a href="#resultSec">精算結果</a>
+  <a href="#formSec">入力</a>
+  <a href="#listSec">一覧</a>
+  <a href="#memberSec">メンバー</a>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ===== Firebase の設定値（コンソールの firebaseConfig をここに貼る）=====
+// 未設定（null）のあいだは「お試しモード」で、このブラウザの中だけに保存します。
+const firebaseConfig = null;
+// =====================================================================
+
+const FB_VER = '10.14.1';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const yen = n => (n < 0 ? '−' : '') + Math.abs(n).toLocaleString('ja-JP') + '円';
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const fmtDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); if (!m) return s || ''; const w = '日月火水木金土'[new Date(+m[1], m[2] - 1, +m[3]).getDay()]; return `${+m[2]}/${+m[3]}（${w}）`; };
+function lsGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch {} }
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 1800); }
+
+// ----- 合言葉 -----
+function getKey() {
+  const k = new URLSearchParams(location.hash.slice(1)).get('k');
+  return k && /^[0-9A-Za-z_-]{20,100}$/.test(k) ? k : null;
+}
+function newKey() {
+  const abc = '0123456789abcdefghijklmnopqrstuvwxyz', a = new Uint32Array(24);
+  crypto.getRandomValues(a);
+  return Array.from(a, x => abc[x % abc.length]).join('');
+}
+
+// ----- 保存先（Firestore / お試しモード）-----
+async function firestoreStore(key) {
+  const app = await import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app.js`);
+  const fs = await import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-firestore.js`);
+  const db = fs.getFirestore(app.initializeApp(firebaseConfig));
+  const mCol = fs.collection(db, 'trips', key, 'members');
+  const eCol = fs.collection(db, 'trips', key, 'expenses');
+  return {
+    mode: 'firestore',
+    subscribe(cb, onErr) {
+      const state = { members: null, expenses: null };
+      const emit = () => { if (state.members && state.expenses) cb(state.members, state.expenses); };
+      fs.onSnapshot(mCol, s => { state.members = s.docs.map(d => ({ id: d.id, ...d.data() })); emit(); }, onErr);
+      fs.onSnapshot(eCol, s => { state.expenses = s.docs.map(d => ({ id: d.id, ...d.data() })); emit(); }, onErr);
+    },
+    addMember: (name, order) => fs.addDoc(mCol, { name, order, createdAt: fs.serverTimestamp() }),
+    deleteMember: id => fs.deleteDoc(fs.doc(mCol, id)),
+    addExpense: d => fs.addDoc(eCol, { ...d, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp() }),
+    updateExpense: (id, d) => fs.updateDoc(fs.doc(eCol, id), { ...d, updatedAt: fs.serverTimestamp() }),
+    deleteExpense: id => fs.deleteDoc(fs.doc(eCol, id)),
+  };
+}
+function localStore(key) {
+  const LK = 'warikan-demo-' + key;
+  let cbs = [];
+  const load = () => { try { return JSON.parse(lsGet(LK)) || { members: {}, expenses: {} }; } catch { return { members: {}, expenses: {} }; } };
+  const emit = () => { const s = load(); const m = Object.entries(s.members).map(([id, v]) => ({ id, ...v })); const e = Object.entries(s.expenses).map(([id, v]) => ({ id, ...v })); cbs.forEach(cb => cb(m, e)); };
+  const mut = f => { const s = load(); f(s); lsSet(LK, JSON.stringify(s)); setTimeout(emit, 0); return Promise.resolve(); };
+  const id = () => Math.random().toString(36).slice(2, 12);
+  window.addEventListener('storage', e => { if (e.key === LK) emit(); });
+  return {
+    mode: 'local',
+    subscribe(cb) { cbs.push(cb); emit(); },
+    addMember: (name, order) => mut(s => { s.members[id()] = { name, order, createdAt: Date.now() }; }),
+    deleteMember: mid => mut(s => { delete s.members[mid]; }),
+    addExpense: d => mut(s => { s.expenses[id()] = { ...d, createdAt: Date.now(), updatedAt: Date.now() }; }),
+    updateExpense: (eid, d) => mut(s => { s.expenses[eid] = { ...s.expenses[eid], ...d, updatedAt: Date.now() }; }),
+    deleteExpense: eid => mut(s => { delete s.expenses[eid]; }),
+  };
+}
+
+// ----- 計算 -----
+// 1人あたりの負担を1円単位で出す。割り切れない端数は、メンバー順で先の人から1円ずつ負担。
+function shares(exp, order) {
+  const parts = [...exp.participants].sort((a, b) => (order[a] ?? 1e9) - (order[b] ?? 1e9));
+  const n = parts.length, base = Math.floor(exp.amount / n), rem = exp.amount - base * n;
+  const out = {};
+  parts.forEach((p, i) => { out[p] = base + (i < rem ? 1 : 0); });
+  return out;
+}
+function settle(members, expenses) {
+  const order = Object.fromEntries(members.map((m, i) => [m.id, i]));
+  const bal = Object.fromEntries(members.map(m => [m.id, { paid: 0, owe: 0 }]));
+  for (const e of expenses) {
+    if (!bal[e.payer] || !e.participants.every(p => bal[p])) continue;
+    bal[e.payer].paid += e.amount;
+    for (const [p, v] of Object.entries(shares(e, order))) bal[p].owe += v;
+  }
+  // 送金回数が少なくなるよう、一番多く受け取る人と一番多く払う人から順に組み合わせる
+  const cred = [], debt = [];
+  for (const m of members) { const d = bal[m.id].paid - bal[m.id].owe; if (d > 0) cred.push([m.id, d]); else if (d < 0) debt.push([m.id, -d]); }
+  const transfers = [];
+  while (cred.length && debt.length) {
+    cred.sort((a, b) => b[1] - a[1]); debt.sort((a, b) => b[1] - a[1]);
+    const c = cred[0], d = debt[0], x = Math.min(c[1], d[1]);
+    transfers.push({ from: d[0], to: c[0], amount: x });
+    c[1] -= x; d[1] -= x;
+    if (!c[1]) cred.shift();
+    if (!d[1]) debt.shift();
+  }
+  return { bal, transfers };
+}
+
+// ----- 画面 -----
+let store, key, members = [], expenses = [], editingId = null;
+const meKey = () => 'warikan-me-' + key;
+const nameOf = id => members.find(m => m.id === id)?.name ?? '（削除済み）';
+
+function render() {
+  members.sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || String(a.id).localeCompare(b.id));
+  expenses.sort((a, b) => String(b.date).localeCompare(String(a.date)) || (tsNum(b.createdAt) - tsNum(a.createdAt)));
+  renderWho(); renderMembers(); renderFormOptions(); renderList(); renderResult();
+}
+const tsNum = t => t == null ? Date.now() : typeof t === 'number' ? t : t.toMillis ? t.toMillis() : 0;
+
+function renderWho() {
+  const me = lsGet(meKey());
+  const meOk = members.some(m => m.id === me);
+  if (!members.length) { $('whoBody').innerHTML = '<p class="empty">まず下の「メンバー」で名前を登録してください。</p>'; return; }
+  if (meOk) {
+    $('whoBody').innerHTML = `<div class="row"><div style="font-size:17px;font-weight:800">${esc(nameOf(me))} さん</div><button class="sub small shrink" id="whoChange">変更</button></div>`;
+    $('whoChange').onclick = () => { lsSet(meKey(), ''); render(); };
+  } else {
+    $('whoBody').innerHTML = `<div class="chips">${members.map(m => `<button class="sub" data-me="${esc(m.id)}">${esc(m.name)}</button>`).join('')}</div>`;
+    $('whoBody').querySelectorAll('[data-me]').forEach(b => b.onclick = () => { lsSet(meKey(), b.dataset.me); render(); toast(`${nameOf(b.dataset.me)} さんとして記録します`); });
+  }
+}
+
+function renderMembers() {
+  const used = new Set(expenses.flatMap(e => [e.payer, ...e.participants]));
+  $('memberChips').innerHTML = members.length
+    ? members.map(m => `<span class="chip">${esc(m.name)}${used.has(m.id) ? '' : `<button data-del="${esc(m.id)}" aria-label="${esc(m.name)}を削除">✕</button>`}</span>`).join('')
+    : '<p class="empty">まだメンバーがいません。</p>';
+  $('memberChips').querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    if (!confirm(`${nameOf(b.dataset.del)} さんをメンバーから削除しますか？`)) return;
+    await run(store.deleteMember(b.dataset.del));
+  });
+}
+
+function renderFormOptions() {
+  const prevPayer = $('fPayer').value;
+  const prevParts = new Set([...$('fParts').querySelectorAll('input:checked')].map(i => i.value));
+  const fresh = !$('fParts').children.length || $('fParts').dataset.sig !== members.map(m => m.id).join();
+  const me = lsGet(meKey());
+  $('fPayer').innerHTML = members.map(m => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');
+  $('fPayer').value = members.some(m => m.id === prevPayer) ? prevPayer : (members.some(m => m.id === me) ? me : (members[0]?.id ?? ''));
+  $('fParts').innerHTML = members.map(m => `<label><input type="checkbox" value="${esc(m.id)}" ${fresh || prevParts.has(m.id) ? 'checked' : ''}>${esc(m.name)}</label>`).join('');
+  $('fParts').dataset.sig = members.map(m => m.id).join();
+  $('saveBtn').disabled = !members.length;
+  updatePerHead();
+}
+function updatePerHead() {
+  const n = $('fParts').querySelectorAll('input:checked').length, a = parseInt($('fAmount').value, 10);
+  $('perHead').textContent = n && a > 0 ? `${n}人で割って 1人あたり 約${Math.ceil(a / n).toLocaleString('ja-JP')}円` : '';
+}
+
+function renderList() {
+  if (!expenses.length) { $('listBody').innerHTML = '<p class="empty">まだ支払いがありません。</p>'; return; }
+  const all = members.length;
+  $('listBody').innerHTML = expenses.map(e => {
+    const who = e.participants.length === all && members.every(m => e.participants.includes(m.id)) ? '全員' : e.participants.map(nameOf).join('・');
+    return `<div class="exp">
+      <div class="exp-head"><div class="exp-title">${esc(e.title)}</div><div class="exp-amount">${yen(e.amount)}</div></div>
+      <div class="exp-meta">${esc(fmtDate(e.date))}　${esc(nameOf(e.payer))} が立て替え ／ ${esc(who)}の分</div>
+      <div class="exp-meta">入力：${esc(e.createdBy ? nameOf(e.createdBy) : '不明')}</div>
+      <div class="exp-actions"><button class="sub small" data-edit="${esc(e.id)}">修正</button><button class="danger small" data-delx="${esc(e.id)}">削除</button></div>
+    </div>`;
+  }).join('');
+  $('listBody').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => startEdit(b.dataset.edit));
+  $('listBody').querySelectorAll('[data-delx]').forEach(b => b.onclick = async () => {
+    const e = expenses.find(x => x.id === b.dataset.delx);
+    if (!confirm(`「${e.title}」${yen(e.amount)} を削除しますか？`)) return;
+    if (editingId === e.id) endEdit();
+    await run(store.deleteExpense(e.id), '削除しました');
+  });
+}
+
+function renderResult() {
+  if (!members.length || !expenses.length) { $('resultBody').innerHTML = '<p class="empty">支払いを入力すると、ここに精算結果が出ます。</p>'; return; }
+  const { bal, transfers } = settle(members, expenses);
+  const total = expenses.reduce((s, e) => s + e.amount, 0);
+  const rows = members.map(m => { const b = bal[m.id], d = b.paid - b.owe; return `<tr><td>${esc(m.name)}</td><td>${yen(b.paid)}</td><td>${yen(b.owe)}</td><td class="${d > 0 ? 'plus' : d < 0 ? 'minus' : ''}">${d > 0 ? '+' : ''}${yen(d)}</td></tr>`; }).join('');
+  $('resultBody').innerHTML = `<p class="total">合計 ${yen(total)}（${expenses.length}件）</p>
+    <table><thead><tr><th>名前</th><th>払った額</th><th>負担額</th><th>差額</th></tr></thead><tbody>${rows}</tbody></table>
+    <h2 style="margin:16px 0 0;font-size:15px">誰が誰に払うか</h2>
+    ${transfers.length ? transfers.map(t => `<div class="transfer"><span>${esc(nameOf(t.from))} → ${esc(nameOf(t.to))}</span><b>${yen(t.amount)}</b></div>`).join('') : '<p class="empty" style="margin-top:8px">精算は不要です（全員の差額が0円）。</p>'}
+    <p class="note">割り切れない端数は、メンバー順で先の人が1円ずつ多く負担します。</p>`;
+}
+
+function startEdit(id) {
+  const e = expenses.find(x => x.id === id); if (!e) return;
+  editingId = id;
+  $('fTitle').value = e.title; $('fAmount').value = e.amount; $('fDate').value = e.date; $('fPayer').value = e.payer;
+  $('fParts').querySelectorAll('input').forEach(i => i.checked = e.participants.includes(i.value));
+  $('formTitle').textContent = '支払いを修正'; $('saveBtn').textContent = '修正を保存'; $('cancelEdit').classList.remove('hidden');
+  updatePerHead();
+  $('formSec').scrollIntoView();
+}
+function endEdit() {
+  editingId = null;
+  $('expForm').reset(); $('fDate').value = today();
+  $('fParts').querySelectorAll('input').forEach(i => i.checked = true);
+  $('formTitle').textContent = '支払いを入力'; $('saveBtn').textContent = '追加する'; $('cancelEdit').classList.add('hidden');
+  renderFormOptions();
+}
+
+async function run(p, okMsg) {
+  try { await p; if (okMsg) toast(okMsg); return true; }
+  catch (err) { console.error(err); alert('保存できませんでした。通信状態を確認して、もう一度お試しください。\n' + (err?.code || err?.message || '')); return false; }
+}
+
+function bindForms() {
+  $('fDate').value = today();
+  $('fAmount').addEventListener('input', updatePerHead);
+  $('fParts').addEventListener('change', updatePerHead);
+  $('allBtn').onclick = () => { $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); };
+  $('cancelEdit').onclick = endEdit;
+
+  $('expForm').onsubmit = async ev => {
+    ev.preventDefault();
+    const title = $('fTitle').value.trim(), amount = parseInt($('fAmount').value, 10), date = $('fDate').value, payer = $('fPayer').value;
+    const participants = [...$('fParts').querySelectorAll('input:checked')].map(i => i.value);
+    if (!title) return alert('内容を入力してください');
+    if (!(amount >= 1 && amount <= 10000000) || String(amount) !== $('fAmount').value.trim()) return alert('金額は1〜10,000,000の整数で入力してください');
+    if (!participants.length) return alert('「誰の分か」を1人以上選んでください');
+    const me = lsGet(meKey());
+    const data = { title, amount, payer, participants, date };
+    $('saveBtn').disabled = true;
+    const ok = editingId
+      ? await run(store.updateExpense(editingId, data), '修正しました')
+      : await run(store.addExpense({ ...data, createdBy: members.some(m => m.id === me) ? me : '' }), '追加しました');
+    $('saveBtn').disabled = false;
+    if (ok) endEdit();
+  };
+
+  $('memberForm').onsubmit = async ev => {
+    ev.preventDefault();
+    const name = $('mName').value.trim();
+    if (!name) return;
+    if (members.some(m => m.name === name)) return alert('同じ名前のメンバーがいます');
+    const order = members.reduce((mx, m) => Math.max(mx, m.order ?? 0), 0) + 1;
+    if (await run(store.addMember(name, order), `${name} さんを追加しました`)) $('mName').value = '';
+  };
+
+  $('copyBtn').onclick = async () => {
+    try { await navigator.clipboard.writeText(location.href); toast('URLをコピーしました'); }
+    catch { prompt('このURLをコピーしてください', location.href); }
+  };
+}
+
+async function start() {
+  key = getKey();
+  if (!key) {
+    $('noKey').classList.remove('hidden'); $('nav').classList.add('hidden');
+    $('newKeyBtn').onclick = () => { location.hash = 'k=' + newKey(); location.reload(); };
+    return;
+  }
+  $('app').classList.remove('hidden');
+  $('shareUrl').textContent = location.href;
+  bindForms();
+  if (firebaseConfig) {
+    try { store = await firestoreStore(key); }
+    catch (err) { console.error(err); $('modeBanner').innerHTML = '<div class="banner alert">データベースに接続できませんでした。通信状態を確認して、ページを開き直してください。</div>'; return; }
+  } else {
+    store = localStore(key);
+    $('modeBanner').innerHTML = '<div class="banner warn"><b>お試しモード</b>：データベースが未設定のため、入力はこのブラウザの中だけに保存されます。ほかの人には見えません。</div>';
+  }
+  store.subscribe((m, e) => { members = m; expenses = e; render(); },
+    err => { console.error(err); $('modeBanner').innerHTML = `<div class="banner alert">データを読み込めませんでした（${esc(err?.code || '')}）。URLが正しいか確認してください。</div>`; });
+}
+window.addEventListener('hashchange', () => location.reload());
+start();
+</script>
+</body>
+</html>

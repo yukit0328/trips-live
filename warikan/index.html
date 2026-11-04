@@ -56,7 +56,12 @@ th{font-size:12px;color:var(--muted);font-weight:700}
 .minus{color:var(--alert);font-weight:800}
 .transfer{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--soft);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:15px}
 .transfer b{font-size:16px}
-.total{font-size:14px;color:var(--muted);margin:0 0 8px}
+.mine{border:2px solid var(--accent);border-radius:12px;padding:12px;margin-bottom:4px}
+.mine-h{font-weight:800;font-size:16px}
+.mine .transfer{background:#fff;border:1px solid var(--line)}
+.rh{font-size:15px;margin:18px 0 6px;color:var(--ink)}
+.person{border-top:1px solid var(--line);padding:8px 0}
+.person-h{display:flex;justify-content:space-between;gap:8px;font-size:15px}
 .empty{color:var(--muted);font-size:14px;margin:0}
 .urlbox{font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all;background:var(--soft);border-radius:8px;padding:8px 10px;margin:6px 0}
 .hidden{display:none!important}
@@ -152,10 +157,10 @@ nav.bottom a:active{background:var(--soft)}
 
 <nav class="bottom" id="nav">
   <a href="../">しおり</a>
-  <a href="#resultSec">精算結果</a>
-  <a href="#formSec">入力</a>
-  <a href="#listSec">一覧</a>
-  <a href="#memberSec">メンバー</a>
+  <a href="#" data-go="resultSec">精算結果</a>
+  <a href="#" data-go="formSec">入力</a>
+  <a href="#" data-go="listSec">一覧</a>
+  <a href="#" data-go="memberSec">メンバー</a>
 </nav>
 <div class="toast" id="toast"></div>
 
@@ -337,11 +342,39 @@ function renderResult() {
   if (!members.length || !expenses.length) { $('resultBody').innerHTML = '<p class="empty">支払いを入力すると、ここに精算結果が出ます。</p>'; return; }
   const { bal, transfers } = settle(members, expenses);
   const total = expenses.reduce((s, e) => s + e.amount, 0);
-  const rows = members.map(m => { const b = bal[m.id], d = b.paid - b.owe; return `<tr><td>${esc(m.name)}</td><td>${yen(b.paid)}</td><td>${yen(b.owe)}</td><td class="${d > 0 ? 'plus' : d < 0 ? 'minus' : ''}">${d > 0 ? '+' : ''}${yen(d)}</td></tr>`; }).join('');
-  $('resultBody').innerHTML = `<p class="total">合計 ${yen(total)}（${expenses.length}件）</p>
-    <table><thead><tr><th>名前</th><th>払った額</th><th>負担額</th><th>差額</th></tr></thead><tbody>${rows}</tbody></table>
-    <h2 style="margin:16px 0 0;font-size:15px">誰が誰に払うか</h2>
-    ${transfers.length ? transfers.map(t => `<div class="transfer"><span>${esc(nameOf(t.from))} → ${esc(nameOf(t.to))}</span><b>${yen(t.amount)}</b></div>`).join('') : '<p class="empty" style="margin-top:8px">精算は不要です（全員の差額が0円）。</p>'}
+  const me = lsGet(meKey()), meOk = members.some(m => m.id === me);
+  const n = id => esc(nameOf(id)) + ' さん';
+
+  // あなたの精算（「あなたは誰？」を選んでいるとき）
+  let mine = '';
+  if (meOk) {
+    const pay = transfers.filter(t => t.from === me), get = transfers.filter(t => t.to === me);
+    const lines = [
+      ...pay.map(t => `<div class="transfer"><span>${n(t.to)}に <b>払う</b></span><b class="minus">${yen(t.amount)}</b></div>`),
+      ...get.map(t => `<div class="transfer"><span>${n(t.from)}から <b>受け取る</b></span><b class="plus">${yen(t.amount)}</b></div>`),
+    ];
+    mine = `<div class="mine"><div class="mine-h">${esc(nameOf(me))} さんの精算</div>${lines.length ? lines.join('') : '<p class="empty" style="margin:6px 0 0">払う・受け取るお金はありません。</p>'}</div>`;
+  }
+
+  // 全員の送金
+  const all = transfers.length
+    ? transfers.map(t => `<div class="transfer"><span>${n(t.from)} → ${n(t.to)}</span><b>${yen(t.amount)}</b></div>`).join('')
+    : '<p class="empty" style="margin-top:8px">精算は不要です。</p>';
+
+  // 一人ずつの内訳
+  const detail = members.map(m => {
+    const b = bal[m.id], d = b.paid - b.owe;
+    const res = d > 0 ? `<span class="plus">${yen(d)} 受け取る</span>` : d < 0 ? `<span class="minus">${yen(-d)} 払う</span>` : '精算なし';
+    return `<div class="person"><div class="person-h"><b>${esc(m.name)}</b>${res}</div>
+      <div class="exp-meta">立て替えた額 ${yen(b.paid)} − 自分が使った分 ${yen(b.owe)} ＝ ${d >= 0 ? '+' : ''}${yen(d)}</div></div>`;
+  }).join('');
+
+  $('resultBody').innerHTML = `${mine}
+    <h3 class="rh">全員の精算（このとおりにお金を渡せば完了）</h3>
+    ${all}
+    <h3 class="rh">計算の内訳</h3>
+    <p class="note" style="margin-top:0">合計 ${yen(total)}（${expenses.length}件）。自分が立て替えた額から、自分が使った分を引いた差を精算します。プラスの人は受け取り、マイナスの人は払います。</p>
+    ${detail}
     <p class="note">割り切れない端数は、メンバー順で先の人が1円ずつ多く負担します。</p>`;
 }
 
@@ -426,7 +459,10 @@ async function start() {
   store.subscribe((m, e) => { members = m; expenses = e; render(); },
     err => { console.error(err); $('modeBanner').innerHTML = `<div class="banner alert">データを読み込めませんでした（${esc(err?.code || '')}）。URLが正しいか確認してください。</div>`; });
 }
-window.addEventListener('hashchange', () => location.reload());
+// 下のナビはURLの合言葉（#k=…）を消さないよう、URLを変えずにスクロールする
+document.querySelectorAll('[data-go]').forEach(a => a.onclick = ev => { ev.preventDefault(); $(a.dataset.go).scrollIntoView(); });
+// 合言葉が変わったときだけ開き直す
+window.addEventListener('hashchange', () => { if (getKey() !== key) location.reload(); });
 start();
 </script>
 </body>
