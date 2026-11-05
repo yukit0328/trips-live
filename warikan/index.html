@@ -70,6 +70,10 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+#askAdd{z-index:40}
+.mebar{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin:0 0 14px;font-size:14px}
+.mebar b{font-size:16px}
+#whoChips button{font-size:16px;padding:10px 16px}
 .fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(64px + env(safe-area-inset-bottom));z-index:15;border-radius:999px;padding:14px 20px;font-size:16px;box-shadow:0 6px 18px rgba(23,33,43,.25)}
 .overlay.sheet{align-items:flex-end;padding:0}
 .sheet-body{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:720px;max-height:92vh;overflow:auto;margin:0;border:none;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
@@ -108,12 +112,8 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
 </section>
 
 <div id="app" class="hidden">
-  <!-- あなたは誰？ -->
-  <section id="whoSec">
-    <h2>あなたは誰？</h2>
-    <div id="whoBody"></div>
-    <p class="note">選んだ名前はこのスマホ（ブラウザ）に記憶され、入力者として記録されます。</p>
-  </section>
+  <!-- 入力者（2回目以降はこの1行だけ） -->
+  <div class="mebar" id="meBar"><span id="meName"></span><button type="button" class="linkbtn" id="meChange">変更</button></div>
 
   <!-- 精算結果 -->
   <section id="resultSec">
@@ -195,6 +195,19 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
   </section>
 </div>
 <button type="button" class="fab hidden" id="fab">＋ 支払いを追加</button>
+<div class="overlay hidden" id="whoModal">
+  <div class="dialog">
+    <div class="dialog-h">あなたは誰？</div>
+    <p class="note" style="margin:6px 0 0">選んだ名前はこのスマホに記憶され、支払いを入れるときの「払った人」になります。次からは聞かれません。</p>
+    <div class="chips" id="whoChips" style="margin-top:12px"></div>
+    <label for="whoName" id="whoNameLabel">リストにないときは、名前を入力</label>
+    <form class="row" id="whoForm" autocomplete="off">
+      <div><input type="text" id="whoName" maxlength="20" placeholder="名前（20文字まで）"></div>
+      <button type="submit" class="shrink">これが自分</button>
+    </form>
+    <button type="button" class="linkbtn" id="whoSkip" style="display:block;margin:14px auto 0">あとで（見るだけ）</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 <div class="overlay hidden" id="askAdd">
   <div class="dialog">
@@ -256,7 +269,8 @@ async function firestoreStore(key) {
       fs.onSnapshot(mCol, s => { state.members = s.docs.map(d => ({ id: d.id, ...d.data() })); emit(); }, onErr);
       fs.onSnapshot(eCol, s => { state.expenses = s.docs.map(d => ({ id: d.id, ...d.data() })); emit(); }, onErr);
     },
-    addMember: (name, order) => fs.addDoc(mCol, { name, order, createdAt: fs.serverTimestamp() }),
+    // IDを先に決めて、保存の完了を待たずに画面へ反映できるようにする
+    addMember: (name, order) => { const ref = fs.doc(mCol); return { id: ref.id, done: fs.setDoc(ref, { name, order, createdAt: fs.serverTimestamp() }) }; },
     deleteMember: id => fs.deleteDoc(fs.doc(mCol, id)),
     addExpense: d => fs.addDoc(eCol, { ...d, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp() }),
     updateExpense: (id, d) => fs.updateDoc(fs.doc(eCol, id), { ...d, updatedAt: fs.serverTimestamp() }),
@@ -274,7 +288,7 @@ function localStore(key) {
   return {
     mode: 'local',
     subscribe(cb) { cbs.push(cb); emit(); },
-    addMember: (name, order) => mut(s => { s.members[id()] = { name, order, createdAt: Date.now() }; }),
+    addMember: (name, order) => { const k = id(); return { id: k, done: mut(s => { s.members[k] = { name, order, createdAt: Date.now() }; }) }; },
     deleteMember: mid => mut(s => { delete s.members[mid]; }),
     addExpense: d => mut(s => { s.expenses[id()] = { ...d, createdAt: Date.now(), updatedAt: Date.now() }; }),
     updateExpense: (eid, d) => mut(s => { s.expenses[eid] = { ...s.expenses[eid], ...d, updatedAt: Date.now() }; }),
@@ -330,17 +344,22 @@ function render() {
 }
 const tsNum = t => t == null ? Date.now() : typeof t === 'number' ? t : t.toMillis ? t.toMillis() : 0;
 
+let whoSkipped = false;
 function renderWho() {
   const me = lsGet(meKey());
   const meOk = members.some(m => m.id === me);
-  if (!members.length) { $('whoBody').innerHTML = '<p class="empty">まず下の「メンバー」で名前を登録してください。</p>'; return; }
-  if (meOk) {
-    $('whoBody').innerHTML = `<div class="row"><div style="font-size:17px;font-weight:800">${esc(nameOf(me))} さん</div><button class="sub small shrink" id="whoChange">変更</button></div>`;
-    $('whoChange').onclick = () => { lsSet(meKey(), ''); render(); };
-  } else {
-    $('whoBody').innerHTML = `<div class="chips">${members.map(m => `<button class="sub" data-me="${esc(m.id)}">${esc(m.name)}</button>`).join('')}</div>`;
-    $('whoBody').querySelectorAll('[data-me]').forEach(b => b.onclick = () => { lsSet(meKey(), b.dataset.me); render(); toast(`${nameOf(b.dataset.me)} さんとして記録します`); });
-  }
+  $('meName').innerHTML = meOk ? `<b>${esc(nameOf(me))}</b> さんとして入力中` : '<span style="color:var(--muted)">名前が未選択です</span>';
+  $('meChange').textContent = meOk ? '変更' : '選ぶ';
+  $('whoChips').innerHTML = members.map(m => `<button type="button" class="sub" data-me="${esc(m.id)}">${esc(m.name)}</button>`).join('');
+  $('whoNameLabel').textContent = members.length ? 'リストにないときは、名前を入力' : '自分の名前を入力';
+  $('whoChips').querySelectorAll('[data-me]').forEach(b => b.onclick = () => setMe(b.dataset.me));
+  // 初めて開いたときだけ聞く
+  $('whoModal').classList.toggle('hidden', meOk || whoSkipped);
+}
+function setMe(id) {
+  lsSet(meKey(), id);
+  if (!editingId) $('fPayer').value = id;
+  render(); toast(`${nameOf(id)} さんとして記録します`);
 }
 
 function renderMembers() {
@@ -593,27 +612,43 @@ function bindForms() {
 
   $('memberForm').onsubmit = async ev => {
     ev.preventDefault();
-    const name = $('mName').value.trim();
-    if (!name) return;
-    if (members.some(m => m.name === name)) return alert('同じ名前のメンバーがいます');
-    const order = members.reduce((mx, m) => Math.max(mx, m.order ?? 0), 0) + 1;
-    const allExp = expenses.filter(isAll);
-    if (allExp.length) {
-      const ans = await askInclude(name, allExp);
-      if (ans === 'cancel') return;
-      if (ans === 'no') {
-        // これまでの「全員の分」を、今いるメンバーだけの支払いに切り替える
-        const ids = members.map(m => m.id);
-        for (const e of allExp) if (!(await run(store.updateExpense(e.id, { participants: ids })))) return;
-      }
-    }
-    if (await run(store.addMember(name, order), `${name} さんを追加しました`)) $('mName').value = '';
+    if (await addMemberFlow($('mName').value.trim())) $('mName').value = '';
   };
-
+  $('whoForm').onsubmit = async ev => {
+    ev.preventDefault();
+    const name = $('whoName').value.trim();
+    const same = members.find(m => m.name === name);
+    if (same) { setMe(same.id); return; }
+    let pending = null;
+    const id = await addMemberFlow(name, mid => { pending = mid; lsSet(meKey(), mid); $('whoName').value = ''; $('whoModal').classList.add('hidden'); });
+    if (id) setMe(id);
+    else if (pending) { lsSet(meKey(), ''); render(); }
+  };
+  $('whoSkip').onclick = () => { whoSkipped = true; renderWho(); };
+  $('meChange').onclick = () => { whoSkipped = false; $('whoModal').classList.remove('hidden'); };
   $('copyBtn').onclick = async () => {
     try { await navigator.clipboard.writeText(location.href); toast('URLをコピーしました'); }
     catch { prompt('このURLをコピーしてください', location.href); }
   };
+}
+
+// メンバーを追加して、追加したメンバーのIDを返す（やめたときは null）。onId は保存完了を待たずに呼ぶ
+async function addMemberFlow(name, onId) {
+    if (!name) return null;
+    if (members.some(m => m.name === name)) { alert('同じ名前のメンバーがいます'); return null; }
+    const order = members.reduce((mx, m) => Math.max(mx, m.order ?? 0), 0) + 1;
+    const allExp = expenses.filter(isAll);
+    if (allExp.length) {
+      const ans = await askInclude(name, allExp);
+      if (ans === 'cancel') return null;
+      if (ans === 'no') {
+        // これまでの「全員の分」を、今いるメンバーだけの支払いに切り替える
+        const ids = members.map(m => m.id);
+        for (const e of allExp) if (!(await run(store.updateExpense(e.id, { participants: ids })))) return null;
+      }
+    }
+    try { const { id, done } = store.addMember(name, order); if (onId) onId(id); await done; toast(`${name} さんを追加しました`); return id; }
+    catch (err) { console.error(err); alert('保存できませんでした。通信状態を確認して、もう一度お試しください。'); return null; }
 }
 
 async function start() {
