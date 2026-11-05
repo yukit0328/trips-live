@@ -186,8 +186,15 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
 
 <script type="module">
 // ===== Firebase の設定値（コンソールの firebaseConfig をここに貼る）=====
-// 未設定（null）のあいだは「お試しモード」で、このブラウザの中だけに保存します。
-const firebaseConfig = null;
+// null にすると「お試しモード」になり、このブラウザの中だけに保存します。
+const firebaseConfig = {
+  apiKey: "AIzaSyA6CsBv7aoHaI43DYLPpAuNn4IOkiVMcgw",
+  authDomain: "trips-warikan.firebaseapp.com",
+  projectId: "trips-warikan",
+  storageBucket: "trips-warikan.firebasestorage.app",
+  messagingSenderId: "670510838103",
+  appId: "1:670510838103:web:110e53e7d0d86332780e12"
+};
 // =====================================================================
 
 const FB_VER = '10.14.1';
