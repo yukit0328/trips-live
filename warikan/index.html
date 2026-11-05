@@ -161,7 +161,7 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
     <button class="sub" id="copyBtn">URLをコピー</button>
   </section>
 </div>
-<p class="note" style="text-align:center">版 2026-11-05b</p>
+<p class="note" style="text-align:center">版 2026-11-05c</p>
 </main>
 
 <nav class="bottom" id="nav">
@@ -177,11 +177,13 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
     <div class="sheet-head"><h2 id="formTitle">支払いを追加</h2><button type="button" class="linkbtn" id="sheetClose">閉じる</button></div>
     <form id="expForm" autocomplete="off">
       <label for="fAmount">金額（円）</label>
-      <div class="row">
-        <div><input type="number" id="fAmount" class="big" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required></div>
-        <label for="camInput" class="sub shrink btnlike" id="camBtn">📷 レシート</label>
+      <input type="number" id="fAmount" class="big" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required>
+      <div class="row" style="margin-top:8px">
+        <label for="camInput" class="btnlike" id="camBtn">📷 レシートを撮る</label>
+        <label for="picInput" class="btnlike" id="picBtn">🖼 写真から選ぶ</label>
       </div>
-      <input type="file" id="camInput" accept="image/*" class="visually-hidden">
+      <input type="file" id="camInput" accept="image/*" capture="environment" class="visually-hidden">
+      <input type="file" id="picInput" accept="image/*" class="visually-hidden">
       <div id="ocrBox" class="ocr hidden"></div>
       <div id="photoBox" class="photo hidden"><img id="photoThumb" alt="レシート写真"><label><input type="checkbox" id="fKeepPhoto" checked>この写真を保存する</label></div>
       <label for="fTitle">内容</label>
@@ -672,12 +674,13 @@ function bindForms() {
   $('fDate').addEventListener('change', updateSummary);
   $('titleChips').innerHTML = QUICK_TITLES.map(t => `<button type="button">${t}</button>`).join('');
   $('titleChips').querySelectorAll('button').forEach(b => b.onclick = () => { $('fTitle').value = b.textContent; });
-  $('camInput').onchange = async () => {
-    const f = $('camInput').files[0]; $('camInput').value = ''; if (!f) return;
+  const onPhoto = async ev => {
+    const inp = ev.target, f = inp.files[0]; inp.value = ''; if (!f) return;
     readReceipt(f);
     try { pendingPhoto = await compressPhoto(f); } catch (err) { console.error(err); pendingPhoto = null; }
     if (pendingPhoto) { $('photoThumb').src = pendingPhoto; $('photoBox').classList.remove('hidden'); }
   };
+  $('camInput').onchange = onPhoto; $('picInput').onchange = onPhoto;
   $('viewerClose').onclick = () => $('viewer').classList.add('hidden');
   $('viewer').addEventListener('click', ev => { if (ev.target === $('viewer')) $('viewer').classList.add('hidden'); });
   $('zipBtn').onclick = async () => { $('zipBtn').disabled = true; try { await zipReceipts(); } catch (err) { console.error(err); alert('ダウンロードできませんでした。'); } $('zipBtn').disabled = false; };
