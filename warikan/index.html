@@ -70,6 +70,18 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(64px + env(safe-area-inset-bottom));z-index:15;border-radius:999px;padding:14px 20px;font-size:16px;box-shadow:0 6px 18px rgba(23,33,43,.25)}
+.overlay.sheet{align-items:flex-end;padding:0}
+.sheet-body{background:#fff;border-radius:18px 18px 0 0;width:100%;max-width:720px;max-height:92vh;overflow:auto;margin:0;border:none;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet-head{display:flex;justify-content:space-between;align-items:center}
+.sheet-head h2{margin:0}
+input.big{font-size:24px;font-weight:800;padding:10px 12px}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick button,.ocr button{font-size:13px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--soft);color:var(--accent);border:1px solid var(--line)}
+.summary{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;background:var(--soft);border-radius:10px;padding:8px 12px;font-size:13px}
+.ocr{margin-top:8px;background:var(--warn-bg);border:1px solid #f0d9a6;border-radius:10px;padding:8px 10px;font-size:13px}
+.ocr .cands{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+body.locked{overflow:hidden}
 .checks label.all-chip{border-color:var(--accent);font-weight:700;color:var(--accent)}
 .all-on #fParts label{opacity:.45}
 label.fixed{display:flex;align-items:flex-start;gap:8px;font-weight:400;font-size:14px;background:var(--warn-bg);border:1px solid #f0d9a6;border-radius:10px;padding:10px 12px;margin-top:10px}
@@ -109,35 +121,6 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
     <div id="resultBody"></div>
   </section>
 
-  <!-- 支払いの入力 -->
-  <section id="formSec">
-    <h2 id="formTitle">支払いを入力</h2>
-    <form id="expForm" autocomplete="off">
-      <label for="fTitle">内容</label>
-      <input type="text" id="fTitle" maxlength="50" placeholder="例：昼食、ガソリン、駐車場" required>
-      <div class="row">
-        <div>
-          <label for="fAmount">金額（円）</label>
-          <input type="number" id="fAmount" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required>
-        </div>
-        <div>
-          <label for="fDate">日付</label>
-          <input type="date" id="fDate" required>
-        </div>
-      </div>
-      <label for="fPayer">払った人</label>
-      <select id="fPayer" required></select>
-      <label>誰の分か <button type="button" class="linkbtn" id="allBtn">今いるメンバーを全員選択</button></label>
-      <div class="checks" id="partsBox"><label class="all-chip"><input type="checkbox" id="fAll" checked>全員</label><span id="fParts" style="display:contents"></span></div>
-      <p class="note" id="perHead"></p>
-      <p class="note" id="allNote"></p>
-      <div class="row" style="margin-top:14px">
-        <button type="submit" id="saveBtn">追加する</button>
-        <button type="button" class="sub shrink hidden" id="cancelEdit">やめる</button>
-      </div>
-    </form>
-  </section>
-
   <!-- 一覧 -->
   <section id="listSec">
     <h2>支払いの一覧</h2>
@@ -168,10 +151,50 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
 <nav class="bottom" id="nav">
   <a href="../">しおり</a>
   <a href="#" data-go="resultSec">精算結果</a>
-  <a href="#" data-go="formSec">入力</a>
+  <a href="#" id="navAdd">＋入力</a>
   <a href="#" data-go="listSec">一覧</a>
   <a href="#" data-go="memberSec">メンバー</a>
 </nav>
+<!-- 支払いの入力（＋ボタンから下に開く） -->
+<div class="overlay sheet hidden" id="sheet">
+  <section class="sheet-body" id="formSec">
+    <div class="sheet-head"><h2 id="formTitle">支払いを追加</h2><button type="button" class="linkbtn" id="sheetClose">閉じる</button></div>
+    <form id="expForm" autocomplete="off">
+      <label for="fAmount">金額（円）</label>
+      <div class="row">
+        <div><input type="number" id="fAmount" class="big" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required></div>
+        <button type="button" class="sub shrink" id="camBtn">📷 レシート</button>
+      </div>
+      <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+      <div id="ocrBox" class="ocr hidden"></div>
+      <label for="fTitle">内容</label>
+      <input type="text" id="fTitle" maxlength="50" placeholder="例：昼食、ガソリン、駐車場">
+      <div class="quick" id="titleChips"></div>
+      <div class="summary"><span id="sumText"></span><button type="button" class="linkbtn" id="detailBtn">変更</button></div>
+      <div id="details" class="hidden">
+        <div class="row">
+          <div>
+            <label for="fPayer">払った人</label>
+            <select id="fPayer" required></select>
+          </div>
+          <div>
+            <label for="fDate">日付</label>
+            <input type="date" id="fDate" required>
+          </div>
+        </div>
+        <label>誰の分か <button type="button" class="linkbtn" id="allBtn">今いるメンバーを全員選択</button></label>
+        <div class="checks" id="partsBox"><label class="all-chip"><input type="checkbox" id="fAll" checked>全員</label><span id="fParts" style="display:contents"></span></div>
+        <p class="note" id="allNote"></p>
+      </div>
+      <p class="note" id="perHead"></p>
+      <div class="row" style="margin-top:12px">
+        <button type="submit" id="saveBtn">追加する</button>
+        <button type="button" class="sub shrink hidden" id="cancelEdit">やめる</button>
+      </div>
+    </form>
+  </section>
+</div>
+<button type="button" class="fab hidden" id="fab">＋ 支払いを追加</button>
 <div class="toast" id="toast"></div>
 <div class="overlay hidden" id="askAdd">
   <div class="dialog">
@@ -342,6 +365,25 @@ function renderFormOptions() {
   $('saveBtn').disabled = !members.length;
   updatePerHead();
 }
+const QUICK_TITLES = ['食事', 'カフェ', 'ガソリン', '高速', '駐車場', '宿', '買い物', 'チケット', 'お土産'];
+function updateSummary() {
+  const payer = members.find(m => m.id === $('fPayer').value);
+  const n = $('fParts').querySelectorAll('input:checked').length;
+  const who = $('fAll').checked ? '全員' : n === members.length ? '今いる全員' : [...$('fParts').querySelectorAll('input:checked')].map(i => nameOf(i.value)).join('・') || '（未選択）';
+  $('sumText').textContent = `払った人：${payer ? payer.name : '—'} ／ ${who}の分 ／ ${fmtDate($('fDate').value)}`;
+}
+function openSheet(detail) {
+  if (!members.length) { toast('先にメンバーを登録してください'); $('memberSec').scrollIntoView(); return; }
+  $('sheet').classList.remove('hidden'); document.body.classList.add('locked');
+  $('details').classList.toggle('hidden', !detail); $('detailBtn').classList.toggle('hidden', !!detail);
+  updateSummary();
+  if (!detail) setTimeout(() => $('fAmount').focus(), 50);
+}
+function closeSheet() {
+  $('sheet').classList.add('hidden'); document.body.classList.remove('locked');
+  endEdit();
+}
+
 function updatePerHead() {
   const n = $('fParts').querySelectorAll('input:checked').length, a = parseInt($('fAmount').value, 10);
   const allOn = $('fAll').checked;
@@ -349,6 +391,7 @@ function updatePerHead() {
   $('allNote').textContent = allOn ? '「全員」は、あとから追加したメンバーも含めて割ります。'
     : members.length && n === members.length ? '今いるメンバーだけで割ります（あとから追加した人は含めません）。' : '';
   $('perHead').textContent = n && a > 0 ? `${n}人で割って 1人あたり 約${Math.ceil(a / n).toLocaleString('ja-JP')}円` : '';
+  updateSummary();
 }
 
 function renderList() {
@@ -420,14 +463,17 @@ function startEdit(id) {
   $('fAll').checked = isAll(e);
   $('formTitle').textContent = '支払いを修正'; $('saveBtn').textContent = '修正を保存'; $('cancelEdit').classList.remove('hidden');
   updatePerHead();
-  $('formSec').scrollIntoView();
+  openSheet(true);
 }
 function endEdit() {
   editingId = null;
   $('expForm').reset(); $('fDate').value = today();
   $('fParts').querySelectorAll('input').forEach(i => i.checked = true);
   $('fAll').checked = true;
-  $('formTitle').textContent = '支払いを入力'; $('saveBtn').textContent = '追加する'; $('cancelEdit').classList.add('hidden');
+  $('formTitle').textContent = '支払いを追加'; $('saveBtn').textContent = '追加する'; $('cancelEdit').classList.add('hidden');
+  $('ocrBox').classList.add('hidden'); $('ocrBox').innerHTML = '';
+  const me = lsGet(meKey());
+  if (members.some(m => m.id === me)) $('fPayer').value = me;
   renderFormOptions();
 }
 
@@ -448,6 +494,67 @@ async function run(p, okMsg) {
   catch (err) { console.error(err); alert('保存できませんでした。通信状態を確認して、もう一度お試しください。\n' + (err?.code || err?.message || '')); return false; }
 }
 
+// ----- レシートの読み取り（スマホの中で文字認識。最初の1回だけ認識用データ約5MBを読み込む）-----
+const TESS = { js: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js', worker: 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js', core: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1', lang: 'https://cdn.jsdelivr.net/npm/@tesseract.js-data/jpn@1.0.0/4.0.0_best_int' };
+let ocrWorker = null;
+function loadScript(src) { return new Promise((ok, ng) => { const el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = ng; document.head.appendChild(el); }); }
+async function getOcrWorker(onProgress) {
+  if (ocrWorker) return ocrWorker;
+  if (!window.Tesseract) await loadScript(TESS.js);
+  ocrWorker = await Tesseract.createWorker('jpn', 1, { workerPath: TESS.worker, corePath: TESS.core, langPath: TESS.lang, logger: m => onProgress(m) });
+  return ocrWorker;
+}
+// 写真を縮小・白黒にして読み取りやすくする
+async function prepImage(file) {
+  const bmp = await createImageBitmap(file);
+  const k = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  const g = c.getContext('2d'); g.drawImage(bmp, 0, 0, c.width, c.height);
+  const d = g.getImageData(0, 0, c.width, c.height), px = d.data;
+  for (let i = 0; i < px.length; i += 4) { const y = px[i] * .299 + px[i + 1] * .587 + px[i + 2] * .114; const v = Math.max(0, Math.min(255, (y - 128) * 1.4 + 128)); px[i] = px[i + 1] = px[i + 2] = v; }
+  g.putImageData(d, 0, 0);
+  return c;
+}
+// 読み取った文字から「合計」らしい金額を候補として拾う
+function amountCandidates(text) {
+  const found = new Map();
+  for (let line of text.split(/\n/)) {
+    line = line.normalize('NFKC').replace(/\s+/g, ' ');
+    const kw = line.replace(/\s/g, '');
+    if (/(預|玉り|現金|釣|おつり|ポイント|TEL|電話|レジ|No\.|番号|登録|カード)/i.test(kw)) continue;
+    if (/\d{1,4}[\/年.-]\d{1,2}[\/月.-]\d{1,2}|\d{1,2}:\d{2}/.test(line)) continue;
+    const flat = line.replace(/(\d)[ ,.]{1,2}(?=\d{3}(?!\d))/g, '$1');
+    let score = 0;
+    if (/(合計|お会計|ご請求|お支払|総額|TOTAL)/i.test(kw) && !/小計/.test(kw)) score = 3;
+    else if (/小計/.test(kw)) score = 1;
+    else if (/(税|対象|内訳|点)/.test(kw)) continue;
+    if (/[¥\\円]/.test(line)) score += 1;
+    for (const m of flat.matchAll(/(\d{1,7})(?!\d)/g)) {
+      const v = parseInt(m[1], 10);
+      if (v < 10 || v > 10000000) continue;
+      found.set(v, Math.max(found.get(v) ?? -1, score));
+    }
+  }
+  return [...found.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0]).slice(0, 5).map(([v, sc]) => ({ v, sc }));
+}
+async function readReceipt(file) {
+  const box = $('ocrBox');
+  box.classList.remove('hidden'); box.textContent = 'レシートを読み取っています…';
+  try {
+    const w = await getOcrWorker(m => { if (m.status === 'recognizing text') box.textContent = `読み取り中… ${Math.round(m.progress * 100)}%`; else if (/load/.test(m.status)) box.textContent = '読み取りの準備中…（初回だけ少し時間がかかります）'; });
+    const { data } = await w.recognize(await prepImage(file));
+    window._ocrText = data.text;
+    const cands = amountCandidates(data.text);
+    if (!cands.length) { box.textContent = '金額を読み取れませんでした。手で入力してください。'; return; }
+    if (cands[0].sc >= 3 && !$('fAmount').value) { $('fAmount').value = cands[0].v; updatePerHead(); }
+    box.innerHTML = `<div>${cands[0].sc >= 3 ? '「合計」の金額を入れました。違うときは候補をタップ：' : '金額の候補（タップで入力）：'}</div><div class="cands">${cands.map(c => `<button type="button" data-v="${c.v}">${yen(c.v)}</button>`).join('')}</div>`;
+    box.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { $('fAmount').value = b.dataset.v; updatePerHead(); });
+  } catch (err) {
+    console.error(err);
+    box.textContent = '読み取りに失敗しました。通信状態を確認するか、手で入力してください。';
+  }
+}
+
 function bindForms() {
   $('fDate').value = today();
   $('fAmount').addEventListener('input', updatePerHead);
@@ -455,15 +562,25 @@ function bindForms() {
   $('fParts').addEventListener('change', () => { $('fAll').checked = false; updatePerHead(); });
   $('fAll').addEventListener('change', () => { if ($('fAll').checked) $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); });
   $('allBtn').onclick = () => { $('fAll').checked = false; $('fParts').querySelectorAll('input').forEach(i => i.checked = true); updatePerHead(); };
-  $('cancelEdit').onclick = endEdit;
+  $('cancelEdit').onclick = closeSheet;
+  $('sheetClose').onclick = closeSheet;
+  $('sheet').addEventListener('click', ev => { if (ev.target === $('sheet')) closeSheet(); });
+  $('fab').onclick = () => openSheet(false);
+  $('navAdd').onclick = ev => { ev.preventDefault(); openSheet(false); };
+  $('detailBtn').onclick = () => { $('details').classList.remove('hidden'); $('detailBtn').classList.add('hidden'); };
+  $('fPayer').addEventListener('change', updateSummary);
+  $('fDate').addEventListener('change', updateSummary);
+  $('titleChips').innerHTML = QUICK_TITLES.map(t => `<button type="button">${t}</button>`).join('');
+  $('titleChips').querySelectorAll('button').forEach(b => b.onclick = () => { $('fTitle').value = b.textContent; });
+  $('camBtn').onclick = () => $('camInput').click();
+  $('camInput').onchange = () => { const f = $('camInput').files[0]; $('camInput').value = ''; if (f) readReceipt(f); };
 
   $('expForm').onsubmit = async ev => {
     ev.preventDefault();
-    const title = $('fTitle').value.trim(), amount = parseInt($('fAmount').value, 10), date = $('fDate').value, payer = $('fPayer').value;
+    const title = $('fTitle').value.trim() || 'その他', amount = parseInt($('fAmount').value, 10), date = $('fDate').value, payer = $('fPayer').value;
     const participants = [...$('fParts').querySelectorAll('input:checked')].map(i => i.value);
-    if (!title) return alert('内容を入力してください');
     if (!(amount >= 1 && amount <= 10000000) || String(amount) !== $('fAmount').value.trim()) return alert('金額は1〜10,000,000の整数で入力してください');
-    if (!participants.length) return alert('「誰の分か」を1人以上選んでください');
+    if (!participants.length) { $('details').classList.remove('hidden'); return alert('「誰の分か」を1人以上選んでください'); }
     const me = lsGet(meKey());
     const data = { title, amount, payer, participants: $('fAll').checked ? [ALL] : participants, date };
     $('saveBtn').disabled = true;
@@ -471,7 +588,7 @@ function bindForms() {
       ? await run(store.updateExpense(editingId, data), '修正しました')
       : await run(store.addExpense({ ...data, createdBy: members.some(m => m.id === me) ? me : '' }), '追加しました');
     $('saveBtn').disabled = false;
-    if (ok) endEdit();
+    if (ok) closeSheet();
   };
 
   $('memberForm').onsubmit = async ev => {
@@ -506,7 +623,7 @@ async function start() {
     $('newKeyBtn').onclick = () => { location.hash = 'k=' + newKey(); location.reload(); };
     return;
   }
-  $('app').classList.remove('hidden');
+  $('app').classList.remove('hidden'); $('fab').classList.remove('hidden');
   $('shareUrl').textContent = location.href;
   bindForms();
   if (firebaseConfig) {
