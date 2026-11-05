@@ -70,6 +70,10 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+.camview{position:fixed;inset:0;background:#000;z-index:50;display:flex;flex-direction:column}
+.camview video{flex:1;width:100%;min-height:0;object-fit:contain;background:#000}
+.cambar{display:flex;justify-content:space-between;align-items:center;padding:16px 20px calc(16px + env(safe-area-inset-bottom))}
+.shutter{width:72px;height:72px;border-radius:50%;background:#fff;border:6px solid #9aa;padding:0}
 .btnlike{display:inline-flex;align-items:center;justify-content:center;margin:0;font-size:15px;font-weight:700;border-radius:10px;padding:10px 14px;border:1px solid var(--accent);background:#fff;color:var(--accent);cursor:pointer;-webkit-user-select:none;user-select:none}
 .visually-hidden{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .photo{display:flex;align-items:center;gap:10px;margin-top:8px}
@@ -161,7 +165,7 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
     <button class="sub" id="copyBtn">URLをコピー</button>
   </section>
 </div>
-<p class="note" style="text-align:center">版 2026-11-05c</p>
+<p class="note" style="text-align:center">版 2026-11-05d</p>
 </main>
 
 <nav class="bottom" id="nav">
@@ -179,7 +183,7 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
       <label for="fAmount">金額（円）</label>
       <input type="number" id="fAmount" class="big" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required>
       <div class="row" style="margin-top:8px">
-        <label for="camInput" class="btnlike" id="camBtn">📷 レシートを撮る</label>
+        <button type="button" class="btnlike" id="camBtn">📷 レシートを撮る</button>
         <label for="picInput" class="btnlike" id="picBtn">🖼 写真から選ぶ</label>
       </div>
       <input type="file" id="camInput" accept="image/*" capture="environment" class="visually-hidden">
@@ -233,6 +237,14 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
     <div id="viewerBody" style="margin-top:10px"></div>
     <a class="hidden" id="viewerDl" download><button type="button" class="wide">この写真をダウンロード</button></a>
     <button type="button" class="linkbtn" id="viewerClose" style="display:block;margin:12px auto 0">閉じる</button>
+  </div>
+</div>
+<div class="camview hidden" id="camView">
+  <video id="camVideo" playsinline autoplay muted></video>
+  <div class="cambar">
+    <button type="button" class="sub" id="camCancel">やめる</button>
+    <button type="button" class="shutter" id="camShot" aria-label="撮影"></button>
+    <span style="width:72px"></span>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -674,13 +686,36 @@ function bindForms() {
   $('fDate').addEventListener('change', updateSummary);
   $('titleChips').innerHTML = QUICK_TITLES.map(t => `<button type="button">${t}</button>`).join('');
   $('titleChips').querySelectorAll('button').forEach(b => b.onclick = () => { $('fTitle').value = b.textContent; });
-  const onPhoto = async ev => {
-    const inp = ev.target, f = inp.files[0]; inp.value = ''; if (!f) return;
+  const usePhoto = async f => {
     readReceipt(f);
     try { pendingPhoto = await compressPhoto(f); } catch (err) { console.error(err); pendingPhoto = null; }
     if (pendingPhoto) { $('photoThumb').src = pendingPhoto; $('photoBox').classList.remove('hidden'); }
   };
+  const onPhoto = ev => { const inp = ev.target, f = inp.files[0]; inp.value = ''; if (f) usePhoto(f); };
   $('camInput').onchange = onPhoto; $('picInput').onchange = onPhoto;
+  // ページの中でカメラを開く（使えないときはブラウザ標準のカメラ呼び出しに切り替える）
+  let camStream = null;
+  const stopCam = () => { camStream?.getTracks().forEach(t => t.stop()); camStream = null; $('camView').classList.add('hidden'); };
+  $('camBtn').onclick = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) { $('camInput').click(); return; }
+    try {
+      camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false });
+      $('camVideo').srcObject = camStream; $('camView').classList.remove('hidden');
+    } catch (err) {
+      console.error(err);
+      alert(err?.name === 'NotAllowedError'
+        ? 'カメラの使用が許可されていません。Chrome のアドレスバー左のアイコン →「権限」でカメラを許可するか、スマホの設定 →アプリ →Chrome →権限 でカメラを許可してください。今回は「写真から選ぶ」を使ってください。'
+        : 'カメラを起動できませんでした。「写真から選ぶ」を使ってください。');
+    }
+  };
+  $('camCancel').onclick = stopCam;
+  $('camShot').onclick = () => {
+    const v = $('camVideo'); if (!v.videoWidth) return;
+    const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+    c.getContext('2d').drawImage(v, 0, 0);
+    stopCam();
+    c.toBlob(b => { if (b) usePhoto(b); }, 'image/jpeg', .92);
+  };
   $('viewerClose').onclick = () => $('viewer').classList.add('hidden');
   $('viewer').addEventListener('click', ev => { if (ev.target === $('viewer')) $('viewer').classList.add('hidden'); });
   $('zipBtn').onclick = async () => { $('zipBtn').disabled = true; try { await zipReceipts(); } catch (err) { console.error(err); alert('ダウンロードできませんでした。'); } $('zipBtn').disabled = false; };
