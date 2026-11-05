@@ -70,6 +70,11 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+.photo{display:flex;align-items:center;gap:10px;margin-top:8px}
+.photo img{width:56px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.photo label{display:flex;align-items:center;gap:6px;margin:0;font-weight:400;font-size:14px}
+#viewerBody img{width:100%;border-radius:8px;border:1px solid var(--line)}
+#viewer{z-index:35}
 #askAdd{z-index:40}
 .mebar{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin:0 0 14px;font-size:14px}
 .mebar b{font-size:16px}
@@ -138,6 +143,14 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
     <p class="note">支払いに使われているメンバーは削除できません。</p>
   </section>
 
+  <!-- 精算が終わったら -->
+  <section id="endSec">
+    <h2>精算が終わったら</h2>
+    <p class="note" style="margin-top:0">レシート写真をまとめて保存してから、このページのデータ（メンバー・支払い・写真）をすべて削除できます。</p>
+    <button class="sub wide" id="zipBtn">レシート写真をまとめてダウンロード（ZIP）</button>
+    <button class="danger wide" id="wipeBtn" style="margin-top:8px">精算完了・データをすべて削除</button>
+  </section>
+
   <!-- 共有 -->
   <section id="shareSec">
     <h2>このページを共有する</h2>
@@ -167,6 +180,7 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
       </div>
       <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
       <div id="ocrBox" class="ocr hidden"></div>
+      <div id="photoBox" class="photo hidden"><img id="photoThumb" alt="レシート写真"><label><input type="checkbox" id="fKeepPhoto" checked>この写真を保存する</label></div>
       <label for="fTitle">内容</label>
       <input type="text" id="fTitle" maxlength="50" placeholder="例：昼食、ガソリン、駐車場">
       <div class="quick" id="titleChips"></div>
@@ -206,6 +220,14 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
       <button type="submit" class="shrink">これが自分</button>
     </form>
     <button type="button" class="linkbtn" id="whoSkip" style="display:block;margin:14px auto 0">あとで（見るだけ）</button>
+  </div>
+</div>
+<div class="overlay hidden" id="viewer">
+  <div class="dialog">
+    <div class="dialog-h" id="viewerTitle"></div>
+    <div id="viewerBody" style="margin-top:10px"></div>
+    <a class="hidden" id="viewerDl" download><button type="button" class="wide">この写真をダウンロード</button></a>
+    <button type="button" class="linkbtn" id="viewerClose" style="display:block;margin:12px auto 0">閉じる</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -261,6 +283,8 @@ async function firestoreStore(key) {
   const db = fs.getFirestore(app.initializeApp(firebaseConfig));
   const mCol = fs.collection(db, 'trips', key, 'members');
   const eCol = fs.collection(db, 'trips', key, 'expenses');
+  const rCol = fs.collection(db, 'trips', key, 'receipts');
+  const delAll = async col => { const snap = await fs.getDocs(col); for (const d of snap.docs) await fs.deleteDoc(d.ref); };
   return {
     mode: 'firestore',
     subscribe(cb, onErr) {
@@ -272,15 +296,21 @@ async function firestoreStore(key) {
     // IDを先に決めて、保存の完了を待たずに画面へ反映できるようにする
     addMember: (name, order) => { const ref = fs.doc(mCol); return { id: ref.id, done: fs.setDoc(ref, { name, order, createdAt: fs.serverTimestamp() }) }; },
     deleteMember: id => fs.deleteDoc(fs.doc(mCol, id)),
-    addExpense: d => fs.addDoc(eCol, { ...d, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp() }),
+    addExpense: async d => { const ref = fs.doc(eCol); await fs.setDoc(ref, { ...d, createdAt: fs.serverTimestamp(), updatedAt: fs.serverTimestamp() }); return ref.id; },
     updateExpense: (id, d) => fs.updateDoc(fs.doc(eCol, id), { ...d, updatedAt: fs.serverTimestamp() }),
     deleteExpense: id => fs.deleteDoc(fs.doc(eCol, id)),
+    // レシート写真（支払いと同じIDで1枚ずつ）
+    putReceipt: (id, data) => fs.setDoc(fs.doc(rCol, id), { data, createdAt: fs.serverTimestamp() }),
+    getReceipt: async id => { const d = await fs.getDoc(fs.doc(rCol, id)); return d.exists() ? d.data().data : null; },
+    deleteReceipt: id => fs.deleteDoc(fs.doc(rCol, id)),
+    allReceipts: async () => (await fs.getDocs(rCol)).docs.map(d => ({ id: d.id, data: d.data().data })),
+    deleteEverything: async () => { await delAll(rCol); await delAll(eCol); await delAll(mCol); },
   };
 }
 function localStore(key) {
   const LK = 'warikan-demo-' + key;
   let cbs = [];
-  const load = () => { try { return JSON.parse(lsGet(LK)) || { members: {}, expenses: {} }; } catch { return { members: {}, expenses: {} }; } };
+  const load = () => { let s; try { s = JSON.parse(lsGet(LK)); } catch {} s = s || {}; return { members: s.members || {}, expenses: s.expenses || {}, receipts: s.receipts || {} }; };
   const emit = () => { const s = load(); const m = Object.entries(s.members).map(([id, v]) => ({ id, ...v })); const e = Object.entries(s.expenses).map(([id, v]) => ({ id, ...v })); cbs.forEach(cb => cb(m, e)); };
   const mut = f => { const s = load(); f(s); lsSet(LK, JSON.stringify(s)); setTimeout(emit, 0); return Promise.resolve(); };
   const id = () => Math.random().toString(36).slice(2, 12);
@@ -290,9 +320,14 @@ function localStore(key) {
     subscribe(cb) { cbs.push(cb); emit(); },
     addMember: (name, order) => { const k = id(); return { id: k, done: mut(s => { s.members[k] = { name, order, createdAt: Date.now() }; }) }; },
     deleteMember: mid => mut(s => { delete s.members[mid]; }),
-    addExpense: d => mut(s => { s.expenses[id()] = { ...d, createdAt: Date.now(), updatedAt: Date.now() }; }),
+    addExpense: d => { const k = id(); return mut(s => { s.expenses[k] = { ...d, createdAt: Date.now(), updatedAt: Date.now() }; }).then(() => k); },
     updateExpense: (eid, d) => mut(s => { s.expenses[eid] = { ...s.expenses[eid], ...d, updatedAt: Date.now() }; }),
     deleteExpense: eid => mut(s => { delete s.expenses[eid]; }),
+    putReceipt: (eid, data) => mut(s => { s.receipts[eid] = { data }; }),
+    getReceipt: async eid => load().receipts[eid]?.data ?? null,
+    deleteReceipt: eid => mut(s => { delete s.receipts[eid]; }),
+    allReceipts: async () => Object.entries(load().receipts).map(([id, v]) => ({ id, data: v.data })),
+    deleteEverything: () => mut(s => { s.members = {}; s.expenses = {}; s.receipts = {}; }),
   };
 }
 
@@ -422,7 +457,7 @@ function renderList() {
       <div class="exp-head"><div class="exp-title">${esc(e.title)}</div><div class="exp-amount">${yen(e.amount)}</div></div>
       <div class="exp-meta">${esc(fmtDate(e.date))}　${esc(nameOf(e.payer))} が立て替え ／ ${who}の分</div>
       <div class="exp-meta">入力：${esc(e.createdBy ? nameOf(e.createdBy) : '不明')}</div>
-      <div class="exp-actions"><button class="sub small" data-edit="${esc(e.id)}">修正</button><button class="danger small" data-delx="${esc(e.id)}">削除</button></div>
+      <div class="exp-actions">${e.hasReceipt ? `<button class="sub small" data-rc="${esc(e.id)}">🧾 レシート</button>` : ''}<button class="sub small" data-edit="${esc(e.id)}">修正</button><button class="danger small" data-delx="${esc(e.id)}">削除</button></div>
     </div>`;
   }).join('');
   $('listBody').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => startEdit(b.dataset.edit));
@@ -430,8 +465,50 @@ function renderList() {
     const e = expenses.find(x => x.id === b.dataset.delx);
     if (!confirm(`「${e.title}」${yen(e.amount)} を削除しますか？`)) return;
     if (editingId === e.id) endEdit();
-    await run(store.deleteExpense(e.id), '削除しました');
+    if (await run(store.deleteExpense(e.id), '削除しました') && e.hasReceipt) store.deleteReceipt(e.id).catch(console.error);
   });
+  $('listBody').querySelectorAll('[data-rc]').forEach(b => b.onclick = () => showReceipt(b.dataset.rc));
+}
+const fileName = e => `${e.date}_${e.title}_${e.amount}円.jpg`.replace(/[\\/:*?"<>|]/g, '_');
+async function showReceipt(id) {
+  const e = expenses.find(x => x.id === id); if (!e) return;
+  $('viewerTitle').textContent = `${fmtDate(e.date)} ${e.title} ${yen(e.amount)}`;
+  $('viewerBody').innerHTML = '<p class="empty">読み込み中…</p>'; $('viewerDl').classList.add('hidden');
+  $('viewer').classList.remove('hidden');
+  try {
+    const data = await store.getReceipt(id);
+    if (!data) { $('viewerBody').innerHTML = '<p class="empty">写真が見つかりません（保存中か、削除済みです）。</p>'; return; }
+    $('viewerBody').innerHTML = `<img src="${data}" alt="レシート写真">`;
+    $('viewerDl').href = data; $('viewerDl').download = `receipt_${e.date}_${e.amount}.jpg`; $('viewerDl').classList.remove('hidden');
+  } catch (err) { console.error(err); $('viewerBody').innerHTML = '<p class="empty">写真を読み込めませんでした。</p>'; }
+}
+// 写真を保存用に縮小（データベースの1件あたりの上限に収まるよう、大きければ画質を下げて再圧縮）
+async function compressPhoto(file) {
+  const bmp = await createImageBitmap(file);
+  for (const [side, q] of [[1280, .6], [1024, .5], [800, .45]]) {
+    const k = Math.min(1, side / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const url = c.toDataURL('image/jpeg', q);
+    if (url.length < 850000) return url;
+  }
+  return null;
+}
+let pendingPhoto = null;
+async function zipReceipts() {
+  const list = await store.allReceipts();
+  if (!list.length) { alert('保存されているレシート写真はありません。'); return false; }
+  if (!window.JSZip) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+  const zip = new JSZip();
+  for (const r of list) {
+    const e = expenses.find(x => x.id === r.id);
+    zip.file(e ? fileName(e) : `${r.id}.jpg`, r.data.split(',')[1], { base64: true });
+  }
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `receipts_${today()}.zip`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  toast(`${list.length}枚をダウンロードしました`);
+  return true;
 }
 
 function renderResult() {
@@ -491,6 +568,7 @@ function endEdit() {
   $('fAll').checked = true;
   $('formTitle').textContent = '支払いを追加'; $('saveBtn').textContent = '追加する'; $('cancelEdit').classList.add('hidden');
   $('ocrBox').classList.add('hidden'); $('ocrBox').innerHTML = '';
+  pendingPhoto = null; $('photoBox').classList.add('hidden'); $('fKeepPhoto').checked = true;
   const me = lsGet(meKey());
   if (members.some(m => m.id === me)) $('fPayer').value = me;
   renderFormOptions();
@@ -592,7 +670,23 @@ function bindForms() {
   $('titleChips').innerHTML = QUICK_TITLES.map(t => `<button type="button">${t}</button>`).join('');
   $('titleChips').querySelectorAll('button').forEach(b => b.onclick = () => { $('fTitle').value = b.textContent; });
   $('camBtn').onclick = () => $('camInput').click();
-  $('camInput').onchange = () => { const f = $('camInput').files[0]; $('camInput').value = ''; if (f) readReceipt(f); };
+  $('camInput').onchange = async () => {
+    const f = $('camInput').files[0]; $('camInput').value = ''; if (!f) return;
+    readReceipt(f);
+    try { pendingPhoto = await compressPhoto(f); } catch (err) { console.error(err); pendingPhoto = null; }
+    if (pendingPhoto) { $('photoThumb').src = pendingPhoto; $('photoBox').classList.remove('hidden'); }
+  };
+  $('viewerClose').onclick = () => $('viewer').classList.add('hidden');
+  $('viewer').addEventListener('click', ev => { if (ev.target === $('viewer')) $('viewer').classList.add('hidden'); });
+  $('zipBtn').onclick = async () => { $('zipBtn').disabled = true; try { await zipReceipts(); } catch (err) { console.error(err); alert('ダウンロードできませんでした。'); } $('zipBtn').disabled = false; };
+  $('wipeBtn').onclick = async () => {
+    const n = expenses.filter(e => e.hasReceipt).length;
+    if (n && confirm(`レシート写真が${n}枚あります。削除する前にZIPでダウンロードしますか？`)) { try { await zipReceipts(); } catch (err) { console.error(err); if (!confirm('ダウンロードできませんでした。このまま削除を続けますか？')) return; } }
+    if (!confirm('このページのメンバー・支払い・レシート写真をすべて削除します。元に戻せません。削除しますか？')) return;
+    $('wipeBtn').disabled = true;
+    if (await run(store.deleteEverything(), 'すべて削除しました')) lsSet(meKey(), '');
+    $('wipeBtn').disabled = false;
+  };
 
   $('expForm').onsubmit = async ev => {
     ev.preventDefault();
@@ -601,11 +695,20 @@ function bindForms() {
     if (!(amount >= 1 && amount <= 10000000) || String(amount) !== $('fAmount').value.trim()) return alert('金額は1〜10,000,000の整数で入力してください');
     if (!participants.length) { $('details').classList.remove('hidden'); return alert('「誰の分か」を1人以上選んでください'); }
     const me = lsGet(meKey());
+    const photo = pendingPhoto && $('fKeepPhoto').checked ? pendingPhoto : null;
     const data = { title, amount, payer, participants: $('fAll').checked ? [ALL] : participants, date };
+    if (photo) data.hasReceipt = true;
     $('saveBtn').disabled = true;
-    const ok = editingId
-      ? await run(store.updateExpense(editingId, data), '修正しました')
-      : await run(store.addExpense({ ...data, createdBy: members.some(m => m.id === me) ? me : '' }), '追加しました');
+    let ok, id = editingId;
+    const save = d => editingId ? store.updateExpense(editingId, d) : store.addExpense({ ...d, createdBy: members.some(m => m.id === me) ? me : '' });
+    try { const res = await save(data); if (!editingId) id = res; ok = true; }
+    catch (err) {
+      // 写真用のルールがまだ反映されていないときは、写真なしで保存する
+      if (photo && err?.code === 'permission-denied') { delete data.hasReceipt; ok = await run(save(data).then(res => { if (!editingId) id = res; })); if (ok) alert('写真は保存できませんでした（データベースのルールが古いままです）。支払いだけ保存しました。'); $('saveBtn').disabled = false; if (ok) closeSheet(); return; }
+      ok = await run(Promise.reject(err));
+    }
+    if (ok) toast(editingId ? '修正しました' : '追加しました');
+    if (ok && photo) await run(store.putReceipt(id, photo));
     $('saveBtn').disabled = false;
     if (ok) closeSheet();
   };
