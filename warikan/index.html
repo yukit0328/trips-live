@@ -70,6 +70,8 @@ nav.bottom a{flex:1;max-width:140px;text-align:center;font-size:12px;font-weight
 nav.bottom a:active{background:var(--soft)}
 .toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:.92}
+.btnlike{display:inline-flex;align-items:center;justify-content:center;margin:0;font-size:15px;font-weight:700;border-radius:10px;padding:10px 14px;border:1px solid var(--accent);background:#fff;color:var(--accent);cursor:pointer;-webkit-user-select:none;user-select:none}
+.visually-hidden{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .photo{display:flex;align-items:center;gap:10px;margin-top:8px}
 .photo img{width:56px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
 .photo label{display:flex;align-items:center;gap:6px;margin:0;font-weight:400;font-size:14px}
@@ -176,9 +178,9 @@ label.fixed input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-col
       <label for="fAmount">金額（円）</label>
       <div class="row">
         <div><input type="number" id="fAmount" class="big" inputmode="numeric" min="1" max="10000000" step="1" placeholder="3000" required></div>
-        <button type="button" class="sub shrink" id="camBtn">📷 レシート</button>
+        <label for="camInput" class="sub shrink btnlike" id="camBtn">📷 レシート</label>
       </div>
-      <input type="file" id="camInput" accept="image/*" capture="environment" hidden>
+      <input type="file" id="camInput" accept="image/*" class="visually-hidden">
       <div id="ocrBox" class="ocr hidden"></div>
       <div id="photoBox" class="photo hidden"><img id="photoThumb" alt="レシート写真"><label><input type="checkbox" id="fKeepPhoto" checked>この写真を保存する</label></div>
       <label for="fTitle">内容</label>
@@ -669,7 +671,6 @@ function bindForms() {
   $('fDate').addEventListener('change', updateSummary);
   $('titleChips').innerHTML = QUICK_TITLES.map(t => `<button type="button">${t}</button>`).join('');
   $('titleChips').querySelectorAll('button').forEach(b => b.onclick = () => { $('fTitle').value = b.textContent; });
-  $('camBtn').onclick = () => $('camInput').click();
   $('camInput').onchange = async () => {
     const f = $('camInput').files[0]; $('camInput').value = ''; if (!f) return;
     readReceipt(f);
