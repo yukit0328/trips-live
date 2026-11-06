@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>旅のしおり一覧</title>
+<style>
+:root{--ink:#17212b;--muted:#5b6875;--line:#d9e0e6;--bg:#f3f6f8;--paper:#fff;--accent:#245a73}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;line-height:1.6}
+main{max-width:720px;margin:auto;padding:28px max(16px,env(safe-area-inset-left)) 40px max(16px,env(safe-area-inset-right))}
+h1{font-size:26px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 20px;font-size:14px}
+h2{font-size:15px;color:var(--accent);margin:24px 0 8px;letter-spacing:.05em}
+a.trip{display:block;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;text-decoration:none;color:var(--ink);margin-bottom:10px}
+a.trip:active{background:#eaf2f5}
+.date{font-size:13px;font-weight:700;color:var(--accent)}
+.name{font-size:18px;font-weight:800;margin:2px 0}
+.route{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>旅のしおり</h1>
+<p class="lead">旅行ごとのしおりの一覧です。</p>
+
+<h2>旅行中に使う</h2>
+<a class="trip" href="https://yukit0328.github.io/warikan/">
+  <div class="date">割り勘・精算</div>
+  <div class="name">立て替えの記録と精算</div>
+  <div class="route">旅行ごとにページを作り、URLをメンバーに共有して使います。</div>
+</a>
+
+<h2>2026</h2>
+<a class="trip" href="./2026-11-KviBaba/">
+  <div class="date">2026年11月1日（日）〜11月3日（火・祝）</div>
+  <div class="name">名古屋・上田・横浜 3日間の旅</div>
+  <div class="route">東京 → 名古屋 → Earthboat（上田） → Kアリーナ横浜（Kvi Baba LIVE） → 東京</div>
+</a>
+</main>
+</body>
+</html>

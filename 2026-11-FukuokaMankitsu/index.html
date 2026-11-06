@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>福岡満喫旅 旅のしおり</title>
+<style>
+:root{
+  --ink:#17212b;--muted:#5b6875;--line:#d9e0e6;--paper:#fff;--bg:#f3f6f8;
+  --accent:#245a73;--accent2:#1c7c54;--soft:#eaf2f5;--warn-bg:#fff8e8;--warn:#c48a1a;
+  --alert-bg:#fff0ee;--alert:#bd5146;--ok-bg:#ecf7f1;--ok:#1c7c54;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP","Yu Gothic",Meiryo,sans-serif;line-height:1.65;font-size:15px}
+main{max-width:860px;margin:auto;background:var(--paper);padding:16px 16px 96px}
+section{scroll-margin-top:12px}
+h1{font-size:clamp(24px,6.5vw,38px);line-height:1.25;margin:.2em 0}
+h2{font-size:21px;border-bottom:3px solid var(--accent);padding-bottom:6px;margin:1.8em 0 .7em}
+h3{font-size:17px;margin:1.4em 0 .5em;padding-left:10px;border-left:4px solid var(--accent)}
+p{margin:.4em 0 .8em}
+a{color:#145c83;overflow-wrap:anywhere}
+.lead{color:var(--muted);font-size:15px}
+.small{font-size:12.5px;color:var(--muted)}
+.hero{padding:20px 18px;border-radius:16px;background:linear-gradient(135deg,#dfecf1,#f7f9fa);margin-bottom:14px}
+.kicker{color:var(--accent);font-weight:700;letter-spacing:.06em;font-size:12px}
+.pill{display:inline-block;background:#fff;border:1px solid #c9d8e0;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;color:var(--accent);margin:2px 4px 2px 0}
+.badge{display:inline-block;border-radius:6px;padding:1px 7px;font-size:11.5px;font-weight:700;vertical-align:middle;margin-left:4px}
+.b-fix{background:var(--ok-bg);color:var(--ok);border:1px solid #b9e0cb}
+.b-cand{background:var(--soft);color:var(--accent);border:1px solid #c9d8e0}
+.b-chk{background:var(--warn-bg);color:#8a5d00;border:1px solid #efd59a}
+.b-rec{background:#245a73;color:#fff}
+.note{background:var(--warn-bg);border-left:4px solid var(--warn);padding:11px 13px;border-radius:8px;margin:12px 0}
+.alert{background:var(--alert-bg);border-left:4px solid var(--alert);padding:12px 14px;border-radius:8px;margin:12px 0}
+.okbox{background:var(--ok-bg);border-left:4px solid var(--ok);padding:11px 13px;border-radius:8px;margin:12px 0}
+.toc{border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0 18px;background:#fbfcfd}
+.toc strong{display:block;margin-bottom:8px}
+.toc ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toc a{display:flex;align-items:center;min-height:46px;padding:8px 10px;border-radius:10px;background:#fff;border:1px solid var(--line);text-decoration:none;color:var(--ink);font-weight:700;font-size:14px}
+.toc a span{color:var(--accent);margin-right:6px;font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0 14px}
+th,td{border-bottom:1px solid var(--line);padding:8px 7px;text-align:left;vertical-align:top}
+th{background:#f0f4f6;font-size:13px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* timeline */
+.tl{list-style:none;margin:8px 0 16px;padding:0}
+.tl li{position:relative;padding:10px 0 12px 74px;border-bottom:1px dashed var(--line)}
+.tl .t{position:absolute;left:0;top:10px;width:66px;font-weight:800;color:var(--accent);font-size:14px;line-height:1.3}
+.tl .ttl{font-weight:800;font-size:15.5px}
+.tl .m{font-size:13.5px;color:var(--muted);margin:2px 0 6px}
+.tl li.key .ttl{color:var(--alert)}
+.tl li.drive .t::after{content:"🚗";display:block;font-size:13px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.pstrip{display:block;position:relative;height:150px;border-radius:10px;overflow:hidden;background:#e7ecef;margin:6px 0 8px}
+.pstrip img{width:100%;height:100%;object-fit:cover;display:block}
+.pstrip .cap{position:absolute;left:0;bottom:0;right:0;background:rgba(0,0,0,.5);color:#fff;font-size:11px;padding:3px 8px}
+.pstrip.nop{display:none}
+.bl{font-size:13.5px;color:#2b3a47;margin:2px 0 4px}
+.tl .bl{margin:0 0 6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-height:40px;padding:7px 12px;border-radius:10px;border:1px solid #b8c9d2;background:#fff;color:#14506b;text-decoration:none;font-size:13px;font-weight:700;line-height:1.2}
+.btn.cal{border-color:#9bc7ae;color:#14633f;background:#f4fbf7}
+.btn.route{background:#245a73;color:#fff;border-color:#245a73}
+.btn.na{background:#f2f2f2;color:#777;border-color:#ddd;cursor:default}
+.btn:active{transform:scale(.98)}
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:8px 0 14px}
+.card{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.card .ph{position:relative;height:150px;background:#e7ecef}
+.card .ph img{width:100%;height:150px;object-fit:cover;display:block}
+.card .ph .cap{position:absolute;left:0;bottom:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:3px 8px}
+.card .noph{height:72px;display:flex;align-items:center;justify-content:center;flex-direction:column;background:repeating-linear-gradient(45deg,#f1f4f6,#f1f4f6 8px,#e9eef1 8px,#e9eef1 16px);color:#6b7a86;font-size:12px;text-align:center;padding:6px}
+.card .body{padding:12px;flex:1;display:flex;flex-direction:column}
+.card .name{font-weight:800;font-size:15.5px;margin-bottom:2px}
+.card dl{margin:6px 0;font-size:13px;display:grid;grid-template-columns:4.6em 1fr;gap:2px 6px}
+.card dt{color:var(--muted)}
+.card dd{margin:0}
+.card p{font-size:13.5px;margin:4px 0 6px}
+.card .btns{margin-top:auto;padding-top:6px}
+.card.rec{border:2px solid var(--accent)}
+/* checklist */
+.cl{list-style:none;margin:6px 0;padding:0}
+.cl li{display:flex;align-items:flex-start;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14.5px}
+.cl input{width:24px;height:24px;flex:0 0 24px;margin:0;accent-color:var(--accent2)}
+.cl label{flex:1;cursor:pointer}
+.done-wrap{margin-top:8px;border:1px dashed #b9e0cb;border-radius:10px;padding:6px 10px;background:#f8fcfa}
+.done-wrap summary{cursor:pointer;font-weight:700;color:var(--ok);font-size:13.5px;padding:6px 0}
+.done-wrap .cl li label{color:#7a8a94;text-decoration:line-through}
+.cl .sub-items{margin:4px 0 0;padding-left:1.1em;font-size:13.5px;color:var(--muted)}
+.cl .sub-items li{display:list-item;border:0;padding:1px 0;font-size:13.5px}
+.grp{font-weight:800;margin:14px 0 2px;font-size:14.5px;color:var(--accent)}
+/* map */
+.gmap{position:relative;width:100%;height:380px;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin:8px 0;background:#eef2f4}
+.gmap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.mapfallback{display:none;padding:14px;background:#f5f8fa;border:1px solid var(--line);border-radius:12px}
+.legend{list-style:none;padding:0;margin:6px 0;display:grid;gap:4px;font-size:13.5px}
+.legend li span{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:12px;align-items:center;justify-content:center;margin-right:6px}
+.num-icon{background:var(--accent);color:#fff;border:2px solid #fff;border-radius:50%;width:26px!important;height:26px!important;display:flex!important;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+/* calculator */
+.calc{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcfd}
+.calc input[type=time]{font-size:18px;padding:8px;border-radius:8px;border:1px solid #b8c9d2;min-height:44px}
+.calc table td:first-child{white-space:nowrap}
+.verdict-ok{color:var(--ok);font-weight:800}
+.verdict-ng{color:var(--alert);font-weight:800}
+.verdict-mid{color:#8a5d00;font-weight:800}
+/* bottom nav */
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,.97);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.bnav a{flex:1;text-align:center;text-decoration:none;color:var(--accent);font-weight:800;font-size:12px;padding:8px 2px;min-height:44px;border-radius:8px}
+.bnav a:active{background:var(--soft)}
+.plan-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 4px;position:sticky;top:0;z-index:5;background:var(--paper);padding:6px 0}
+.ptab{min-height:54px;border:2px solid var(--accent);border-radius:12px;background:#fff;color:var(--accent);font-weight:800;font-size:15px;line-height:1.25;cursor:pointer;font-family:inherit}
+.ptab span{display:block;font-size:12px;font-weight:700}
+.ptab[aria-selected="true"]{background:var(--accent);color:#fff}
+.plan-panel{scroll-margin-top:72px}
+table.cmp td:first-child{white-space:nowrap;color:var(--muted);font-size:13px}
+table.cmp th a{color:inherit}
+.rec-pts{background:var(--ok-bg);border-radius:10px;padding:8px 10px 6px;margin:6px 0 4px}
+.rec-h{font-size:12px;font-weight:800;color:var(--ok);letter-spacing:.04em}
+.rec-pts ul{margin:3px 0 0;padding-left:1.15em;font-size:13.5px}
+.rec-pts li{margin:2px 0}
+.src li{font-size:12.5px;margin:4px 0}
+footer{border-top:1px solid var(--line);margin-top:28px;padding-top:12px;color:var(--muted);font-size:12px}
+@media (min-width:700px){main{padding:28px 32px 100px}}
+.sub{scroll-margin-top:12px}
+details.cands{border:1px solid var(--line);border-radius:12px;margin:12px 0;background:#fbfcfd;scroll-margin-top:12px}
+details.cands>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:48px;padding:10px 14px;font-weight:800;font-size:15px;color:var(--accent)}
+details.cands>summary::-webkit-details-marker{display:none}
+details.cands>summary .sum-h{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+details.cands>summary .sum-h::after{content:" ▼"}
+details.cands[open]>summary .sum-h{visibility:hidden}
+details.cands[open]>summary{border-bottom:1px solid var(--line)}
+details.cands>*:not(summary){margin-left:10px;margin-right:10px}
+details.cands>.grid{margin-bottom:12px}
+@media (min-width:700px){.toc ol{grid-template-columns:repeat(3,1fr)}}
+
+@media print{.bnav{display:none}body{background:#fff}main{padding:10mm}.card{break-inside:avoid}}
+.warikan-btn{display:flex;align-items:center;justify-content:center;min-height:48px;margin-top:10px;padding:10px 14px;border-radius:12px;background:#1c7c54;color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+.warikan-btn:active{transform:scale(.98)}
+</style>
+</head>
+<body data-tag="福岡満喫旅 しおり">
+<main>
+
+<header class="hero" id="top">
+  <div class="kicker">TRIP BOOKLET · 2026.11.8–11.9 · 1泊2日</div>
+  <h1>福岡満喫旅</h1>
+  <p class="lead">2026年11月8日（日）〜11月9日（月）</p>
+  <p><span class="pill">天麩羅処ひらお</span><span class="pill">中洲の屋台はしご</span><span class="pill">櫛田神社・喫茶ボネ．</span><span class="pill">マリンワールド海の中道</span></p>
+  <a class="warikan-btn" href="https://yukit0328.github.io/warikan/#k=d7od5gl0sgf01rjmzmkhvboh&amp;s=trips-live/2026-11-FukuokaMankitsu/">💴 割り勘・精算ページを開く</a>
+</header>
+
+<nav class="toc" aria-label="目次">
+  <strong>目次</strong>
+  <ol>
+    <li><a href="#overview"><span>1</span>旅行概要</a></li>
+    <li><a href="#day1"><span>2</span>DAY 1：天神・博多・中洲</a></li>
+    <li><a href="#hirao"><span>3</span>ひらおの食べ方</a></li>
+    <li><a href="#yatai"><span>4</span>中洲の屋台</a></li>
+    <li><a href="#day2"><span>5</span>DAY 2：マリンワールド</a></li>
+    <li><a href="#info"><span>6</span>持ち物・注意点</a></li>
+    <li><a href="https://yukit0328.github.io/warikan/#k=d7od5gl0sgf01rjmzmkhvboh&amp;s=trips-live/2026-11-FukuokaMankitsu/"><span>💴</span>割り勘・精算</a></li>
+  </ol>
+</nav>
+
+<div class="alert"><strong>いちばん大事なこと：</strong>屋台に行けるのは<strong>11/8（日）の夜だけ</strong>です（11/9は夕方に解散するため）。<strong>日曜休みの屋台が多く、雨や強風でも休むことがあります。</strong>当日の夕方に、各屋台のSNSか現地で営業しているか確認し、<a href="#yatai">候補</a>の上から順に回ってください。</div>
+
+<section id="overview">
+<h2>1. 旅行概要</h2>
+<table>
+<tr><th style="width:6.5em">集合</th><td>11/8（日）<strong>10:30ごろ Hotel Mei 福岡天神</strong>（博多駅に着いたらそのままホテルへ）</td></tr>
+<tr><th>宿泊</th><td><strong>Hotel Mei 福岡天神</strong>（福岡市中央区春吉2-16-19）に1泊<br><span class="small">地下鉄七隈線 渡辺通駅から徒歩約5分。中洲の屋台まで歩いて行ける距離。チェックイン15:00／チェックアウト10:00。荷物はチェックイン当日の6:00から、チェックアウト後は当日21:00まで預かってもらえる（掲載情報）。</span><a class="pstrip" href="https://www.google.com/maps?cid=13212336765743855720" target="_blank" rel="noopener"><img src="https://lh3.googleusercontent.com/grass-cs/AABkmLeEga9IEin0jsUQq-79NZKzsLLdfrU1g8I1X70Dz9pIB5qZkyYY94My7OLbutp7uIEHleJaAOm-zhiWZPpTI4-GM0bl6MViC-2Jo13Q-JgS1aCCKaxCvLJxEIGR1kZdx27evYNT=w640-h420-k-no" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('nop')"><span class="cap">Hotel Mei 福岡天神（Googleマップの写真）</span></a><div class="btns"><a class="btn" data-q="Hotel Mei 福岡天神 福岡市中央区春吉2-16-19">📍 地図</a><a class="btn" href="https://www.google.com/maps?cid=13212336765743855720" target="_blank" rel="noopener">📷 写真</a></div></td></tr>
+<tr><th>解散</th><td>11/9（月）<strong>15:00ごろ 博多駅</strong>（夕方の飛行機のため、遅くとも16:45には解散）</td></tr>
+<tr><th>やりたいこと</th><td>① ひらおの天ぷら　② 中洲の屋台めぐり　③ マリンワールド海の中道</td></tr>
+<tr><th>支払い</th><td><strong>現金を多めに</strong>（ひらおは全店現金のみ、屋台もほとんどがカード不可）</td></tr>
+</table>
+
+</section>
+
+<section id="day1">
+<h2>2. DAY 1｜11月8日（日） ホテル → 天神 → 博多 → 中洲</h2>
+
+<ul class="tl">
+<li><div class="t">10:17</div><div class="ttl">博多駅を出発（地下鉄七隈線 橋本行き）</div><div class="m">博多駅に着いたら、そのまま七隈線へ。10:22 渡辺通着、歩いて約7分。</div></li>
+<li class="key"><div class="t">10:29<br>〜10:40</div><div class="ttl">Hotel Mei 福岡天神で合流・荷物を預ける</div><div class="m">先にホテルに泊まっているメンバーとここで合流。荷物を預けて身軽に。</div>
+  <div class="btns"><a class="btn" data-q="Hotel Mei 福岡天神 福岡市中央区春吉2-16-19">📍 ホテル</a><a class="btn cal" data-cal='{"t":"Hotel Meiで合流・荷物を預ける","s":"2026-11-08T10:29","e":"2026-11-08T10:40","l":"Hotel Mei 福岡天神 福岡市中央区春吉2-16-19","d":"博多駅10:17発 七隈線 → 渡辺通10:22着"}'>📅 カレンダー</a></div></li>
+<li><div class="t">10:40<br>〜10:52</div><div class="ttl">歩いてアクロス福岡へ</div></li>
+<li class="key"><div class="t">11:00<br>〜12:30</div><div class="ttl">天麩羅処ひらお 天神アクロス店</div><div class="m"><strong>現金のみ</strong>。着いたらまず列に並び、順番が来たら食券を買う。<a href="#hirao">頼み方・食べ方はこちら</a>。</div>
+  <div class="bl">食券を買って並び、揚げたての天ぷらが1品ずつ出てくる定食屋</div><div class="btns"><a class="btn" href="https://www.google.com/maps?cid=17175338040109247455" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="天麩羅処ひらお 天神アクロス店">📍 地図</a><a class="btn" href="https://www.hirao-foods.net/" target="_blank" rel="noopener">🌐 公式</a><a class="btn cal" data-cal='{"t":"ひらお 天神アクロス店","s":"2026-11-08T11:00","e":"2026-11-08T12:30","l":"福岡市中央区天神1-1-1 アクロス福岡 地下2階","d":"現金のみ。食券を買って並ぶ"}'>📅 カレンダー</a></div></li>
+<li><div class="t">12:40<br>〜13:05</div><div class="ttl">警固神社</div><div class="m">アクロス福岡から歩いて約10分。天神のど真ん中にある神社。</div>
+  <a class="pstrip" href="https://www.google.com/maps?cid=1881019903102865317" target="_blank" rel="noopener"><img src="https://lh3.googleusercontent.com/gps-cs-s/ANWiy9QtYq-BT6ziEv7qG12GBDf4888PjVX8_y2X_4YqKnIzV8vHS3FEY_hGI_dKSsJ25DOt1QK25MMGTUo5KgHQfGZ5yUoECcXsu9W8EDeL7PihRyxxM9x52k0nIoj3DJnIJvhz5QuM=w640-h420-k-no" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('nop')"><span class="cap">警固神社（Googleマップの写真）</span></a><div class="btns"><a class="btn" data-q="警固神社">📍 地図</a></div></li>
+<li><div class="t">13:11<br>〜13:16</div><div class="ttl">バスで中洲へ（天神警固神社・三越前 → 中洲・南新地）</div><div class="m">日曜の天神はバスが混むことも。来なければ<strong>地下鉄七隈線 天神南 → 櫛田神社前（1駅）</strong>か、歩いて約20分でもOK。</div></li>
+<li class="key"><div class="t">13:20<br>〜14:00</div><div class="ttl">櫛田神社</div><div class="m">博多の総鎮守。博多祇園山笠の豪華な「飾り山」が境内に飾られています。</div>
+  <a class="pstrip" href="https://www.google.com/maps?cid=11639954002556587428" target="_blank" rel="noopener"><img src="https://lh3.googleusercontent.com/gps-cs-s/ANWiy9Qv92YQCflJknrtSI1xqsXYbLUIqk_pm2qgG1TIJIDirntxdnVncsNh7_4Ksum5hEC28NrW9ciNvGPaSh35kEj5pCCdqLKnE6qLHDG1QgZ1Sye6KTeTXsh7xaIgeY7_2gxcSaO1=w640-h420-k-no" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('nop')"><span class="cap">櫛田神社（Googleマップの写真）</span></a><div class="btns"><a class="btn" data-q="櫛田神社 福岡市博多区">📍 地図</a><a class="btn cal" data-cal='{"t":"櫛田神社","s":"2026-11-08T13:20","e":"2026-11-08T14:00","l":"櫛田神社 福岡市博多区上川端町1-41","d":""}'>📅 カレンダー</a></div></li>
+<li class="key"><div class="t">14:00〜</div><div class="ttl">喫茶ボネ．でひと休み</div><div class="m">櫛田神社から徒歩1分（上川端町1-8）。レトロでおしゃれな喫茶店。名物は<strong>プリン</strong>（黒プリン・白プリンなど）と深煎りのコーヒー。カップを選べることも。</div>
+  <div class="m small">営業 8:00〜18:00／定休 第1・第3月曜（2025年の掲載情報）。約20席なので少し待つことも。</div>
+  <div class="btns"><a class="btn" data-q="喫茶ボネ. 福岡市博多区上川端町1-8">📍 地図</a><a class="btn cal" data-cal='{"t":"喫茶ボネ．","s":"2026-11-08T14:00","e":"2026-11-08T15:00","l":"喫茶ボネ. 福岡市博多区上川端町1-8","d":"プリンとコーヒー"}'>📅 カレンダー</a></div></li>
+<li><div class="t">〜16:00</div><div class="ttl">THE FULL FULL HAKATA（フルフル博多）</div><div class="m">友人おすすめのパン屋。名物は<strong>明太フランス</strong>（明太フランス発祥の店の博多店）。櫛田神社から歩いて約5分（祇園町11）。</div>
+  <div class="m small">営業 10:00〜18:00／火曜定休（2021年の開店時の記事）。最新の営業状況は当日確認を。人気商品は夕方に売り切れることもあるので早めに。<span class="badge b-chk">要確認</span></div>
+  <div class="btns"><a class="btn" data-q="THE FULL FULL HAKATA 福岡市博多区祇園町11">📍 地図</a></div></li>
+<li><div class="t">16:30<br>〜18:00</div><div class="ttl">ホテルにチェックイン・休憩</div><div class="m">夜の屋台に備えてひと休み。屋台へは小さなバッグだけで。ホテルから中洲の屋台までは歩いて10〜15分。</div>
+  <div class="m small">時間が余ったら：櫛田神社のすぐそばの川端通商店街（食べ歩き）や、キャナルシティ博多（徒歩3分）も。</div></li>
+<li class="key"><div class="t">18:30<br>〜22:00</div><div class="ttl">中洲屋台街</div><div class="m">那珂川沿いを歩いて、営業している屋台をのぞきながら回ります。1軒30〜40分が目安。<a href="#yatai">候補とルールはこちら</a>。</div>
+  <div class="bl">那珂川沿いに屋台が並ぶ、中洲の屋台街の中心</div><div class="btns"><a class="btn" href="https://www.google.com/maps?cid=1528032599848205556" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="清流公園 福岡市博多区中洲1丁目">📍 中洲 清流公園（屋台が集まる場所）</a><a class="btn cal" data-cal='{"t":"中洲屋台街","s":"2026-11-08T18:30","e":"2026-11-08T22:00","l":"福岡市博多区中洲 清流公園","d":"現金を持つ。日曜・悪天候は休みの屋台あり"}'>📅 カレンダー</a></div></li>
+<li><div class="t">22:00</div><div class="ttl">ホテルに戻る</div></li>
+</ul>
+</section>
+
+<section id="hirao">
+<h2>3. 天麩羅処ひらお｜頼み方・食べ方</h2>
+<div class="okbox"><strong>ひと言でいうと：</strong>食券を買って並び、席に着くと<strong>揚げたての天ぷらが1品ずつ</strong>運ばれてくる定食屋さん。無料の<strong>いかの塩辛</strong>でご飯が進みます。</div>
+
+<h3>注文の流れ</h3>
+<ol>
+<li>行列があれば、<strong>先に列に並ぶ</strong>。順番が来たら券売機で食券を買う（<strong>現金のみ</strong>）。</li>
+<li>待合席で待ち、空いた席に案内される（4〜5人だと分かれることも）。</li>
+<li>席で食券を出すと、ご飯・味噌汁・天つゆ・いかの塩辛が出てくる。</li>
+<li>あとは天ぷらが揚がるたびに、1品ずつ目の前に届く。</li>
+</ol>
+
+<h3>おすすめの頼み方</h3>
+<div class="scroll"><table>
+<tr><th>定食</th><th>天神アクロス店の値段</th><th>こんな人に</th></tr>
+<tr><td><strong>お好み定食</strong>（人気No.1）</td><td>1,240円</td><td>迷ったらこれ</td></tr>
+<tr><td>えび定食</td><td>1,290円</td><td>えびをしっかり食べたい</td></tr>
+<tr><td>天ぷら定食</td><td>1,140円</td><td>鯖の天ぷらが入るのはこの定食だけ</td></tr>
+<tr><td>とり天定食</td><td>1,140円</td><td>九州らしく、とり天</td></tr>
+</table></div>
+<p class="small">値段は公式サイトの掲載（2026年1月改定・税込）。大名店・天神アクロス店は他店より少し高め。ご飯の大盛りは別の食券（50円）。</p>
+
+<h3>おいしく食べるコツ</h3>
+<div class="rec-pts"><ul>
+<li><strong>えびは、最初のひと口を何もつけずに</strong>（公式のおすすめ）。甘みがよくわかります。</li>
+<li>天つゆは大根おろしがたっぷり。塩もあるので、味を変えながら。</li>
+<li><strong>いかの塩辛</strong>は1人1皿サービス。おかわりは1回だけ50円（2025年5月時点）。気に入ったら持ち帰り用も買えます。</li>
+<li>揚げたてが次々来るので、<strong>来たらすぐ食べる</strong>のがいちばんおいしい。</li>
+</ul></div>
+
+<div class="note"><strong>注意：</strong>全店<strong>予約不可・現金のみ</strong>。営業は10:30〜20:00（オーダーストップ20:00）。昼どきは30〜50分待ちの口コミもあるため、開店直後がおすすめ。大名店は11/6（金）臨時休業の告知あり（11/8は通常営業の見込み）。</div>
+<div class="btns"><a class="btn" href="https://www.google.com/maps?cid=17175338040109247455" target="_blank" rel="noopener">📷 アクロス店の写真</a><a class="btn" href="https://www.hirao-foods.net/howto/" target="_blank" rel="noopener">🌐 公式：食べ方ガイド</a><a class="btn" href="https://www.hirao-foods.net/menu/" target="_blank" rel="noopener">🌐 公式：メニュー</a><a class="btn" href="https://www.hirao-foods.net/open-hour/open-hour-783/" target="_blank" rel="noopener">🌐 公式：営業時間</a></div>
+</section>
+
+<section id="yatai">
+<h2>4. 中洲の屋台｜候補とルール</h2>
+<div class="alert"><strong>日曜の夜です。</strong>日曜休みの屋台がいくつもあります。下の候補は「日曜に開いている可能性が高い順」に並べました。行列の長い店にこだわらず、<strong>開いていて席が空いている店に入る</strong>のが屋台めぐりのコツです。</div>
+
+<h3>日曜に開いている可能性が高い</h3>
+<div class="grid">
+  <div class="card rec"><div class="body">
+    <div class="name">博多屋台 武ちゃん <span class="badge b-rec">いちばん候補</span></div>
+    <dl><dt>場所</dt><dd>中洲1丁目 清流公園</dd><dt>時間</dt><dd>19:00〜翌1:00・不定休（日曜も営業の掲載あり）</dd></dl>
+    <p>名物は<strong>ひとくち餃子</strong>（8個・柚子胡椒つき）。どて鍋、白味噌おでんも。</p>
+    <p class="small">追加注文ができないという紹介あり → 最初に食べたい分をまとめて頼む。</p>
+    <div class="btns"><a class="btn" href="https://www.google.com/maps?cid=3832420986618420711" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="博多屋台 武ちゃん 中洲">📍 地図</a></div></div></div>
+  <div class="card"><div class="body">
+    <div class="name">ケンゾウ <span class="badge b-cand">焼きラーメン</span></div>
+    <dl><dt>場所</dt><dd>中洲5丁目（中洲川端駅から徒歩3分）</dd><dt>時間</dt><dd>19:00〜翌2:00・不定休（日曜も営業の掲載あり）</dd></dl>
+    <p>名物は焼きラーメン。串焼きやおでんも。</p>
+    <p class="small">強風や小雨でも休むことがあるため、天気が悪い日は要注意。</p>
+    <div class="btns"><a class="btn" href="https://www.google.com/maps?cid=7407036953663836909" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="屋台 ケンゾウ 中洲">📍 地図</a></div></div></div>
+  <div class="card"><div class="body">
+    <div class="name">伸龍（しんりゅう） <span class="badge b-cand">ラーメン・明太チーズ餃子</span></div>
+    <dl><dt>場所</dt><dd>中洲1丁目（那珂川沿い）</dd><dt>時間</dt><dd>18:00〜翌1:00・不定休（月〜日営業の掲載あり）</dd></dl>
+    <p>中洲で30年以上の親子経営の老舗。女将がおすすめを教えてくれるので初めてでも安心。行列ができる人気店。</p>
+    <div class="btns"><a class="btn" href="https://www.google.com/maps?cid=10480295291034317394" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="屋台 伸龍 中洲">📍 地図</a></div></div></div>
+</div>
+
+<h3>日曜の営業はわからない（行ってみて開いていれば）</h3>
+<div class="grid">
+  <div class="card"><div class="body">
+    <div class="name">博多屋台 中洲十番</div>
+    <dl><dt>場所</dt><dd>中洲1丁目 清流公園内</dd></dl>
+    <p>糸島豚のポークステーキ、豚骨ラーメン。<strong>カード・QR決済に対応</strong>という数少ない屋台。</p>
+    <div class="btns"><a class="btn" href="https://www.google.com/maps?cid=17086050891697789465" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="博多屋台 中洲十番">📍 地図</a></div></div></div>
+  <div class="card"><div class="body">
+    <div class="name">中洲の屋台 小島商店</div>
+    <dl><dt>場所</dt><dd>中洲1丁目 清流公園内</dd></dl>
+    <p>豚骨ラーメン、出汁もつ焼、明太オムレツ。</p>
+    <div class="btns"><a class="btn" href="https://www.google.com/maps?cid=8550820860710847828" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="中洲の屋台 小島商店">📍 地図</a></div></div></div>
+  <div class="card"><div class="body">
+    <div class="name">博多屋台 よっちゃん</div>
+    <dl><dt>場所</dt><dd>中洲4丁目 清流公園内</dd></dl>
+    <p>焼きラーメン、明太だし巻き卵、野菜巻き串。</p>
+    <div class="btns"><a class="btn" href="https://www.google.com/maps?cid=13518281849518223003" target="_blank" rel="noopener">📷 写真</a><a class="btn" data-q="博多屋台 よっちゃん 中洲">📍 地図</a></div></div></div>
+</div>
+<p class="small">日曜休みの掲載がある店：風来けん坊、とん吉、屋台 呑龍（春吉）、須崎屋台かじしか。今回は候補から外しています。</p>
+
+<h3>はしごのおすすめ順</h3>
+<ol>
+<li><strong>18:30〜19:15</strong> 早く開く<strong>伸龍</strong>で、ラーメン以外のつまみ（明太チーズ餃子など）と乾杯。</li>
+<li><strong>19:30〜20:15</strong> <strong>武ちゃん</strong>でひとくち餃子。</li>
+<li><strong>20:30〜21:15</strong> 締めは<strong>ケンゾウの焼きラーメン</strong>か、開いている店のとんこつラーメン。</li>
+</ol>
+<p class="small">開いていない・満席なら、川沿いを歩いて開いている屋台に入ればOK。</p>
+
+<h3>屋台のルールと気をつけたいこと</h3>
+<ul class="cl">
+<li>🪑 <strong>長居しない</strong>：1軒30〜40分が目安。食べ終わったら次のお客さんに席を譲る。</li>
+<li>🍢 <strong>1人1品以上</strong>頼むのが暗黙のルール。串ものは2本からの店も。</li>
+<li>💴 <strong>現金を持つ</strong>：カード不可の店がほとんど。</li>
+<li>📋 <strong>座る前にメニューと値段を確認</strong>。</li>
+<li>🎒 <strong>荷物は小さく</strong>：大きな荷物は持ち込めない。手荷物はひざの上に。</li>
+<li>🚻 <strong>トイレは先に</strong>：屋台にトイレはない。近くの公衆トイレやコンビニを先に使っておく。</li>
+<li>🍣 <strong>生ものは出ない</strong>（刺身・生野菜などは条例で提供不可）。</li>
+<li>🪑 <strong>常連席に勝手に座らない</strong>：席は店の人の案内に従う。屋台の外での立ち飲みも禁止。</li>
+<li>🧥 <strong>夜は冷える</strong>：11月の川沿いは寒いので上着を。</li>
+<li>☔ <strong>雨・強風の日は休む屋台が多い</strong>：その日はホテル近くの居酒屋に切り替える。</li>
+</ul>
+</section>
+
+<section id="day2">
+<h2>5. DAY 2｜11月9日（月） マリンワールド海の中道 → 博多駅</h2>
+<div class="okbox"><strong>11/9（月）は通常営業</strong>（9:30〜17:30、入館は16:30まで）。大人2,500円（公式サイト、11/6確認）。</div>
+<ul class="tl">
+<li><div class="t">10:00</div><div class="ttl">ホテルをチェックアウト</div><div class="m">荷物はホテルに預けたまま出かけます（当日21時まで預かり可の掲載あり）。</div></li>
+<li><div class="t">10:23</div><div class="ttl">渡辺通駅を出発（地下鉄七隈線 博多行き）</div></li>
+<li><div class="t">10:40</div><div class="ttl">博多駅で乗り換え（JR鹿児島本線 福間行き）</div></li>
+<li><div class="t">11:09</div><div class="ttl">香椎駅で乗り換え（JR香椎線 西戸崎行き）</div><div class="m">香椎線は本数が少ないので、乗り遅れに注意。</div></li>
+<li class="key"><div class="t">11:30<br>〜13:00</div><div class="ttl">マリンワールド海の中道</div><div class="m">海ノ中道駅から歩いてすぐ。この時間に見られるショー（公式・秋平日のスケジュール）：</div>
+  <table>
+  <tr><td style="width:4.5em"><strong>11:45</strong></td><td>外洋大水槽ショー「いわしのじかん」（約10分）</td></tr>
+  <tr><td><strong>12:20</strong></td><td>ペンギンパレード（かいじゅうアイランド・約10分）</td></tr>
+  <tr><td><strong>12:40</strong></td><td>アイランドトーク（かいじゅうアイランド イルカプール・約10分）</td></tr>
+  </table>
+  <div class="m small">イルカ・アシカショー（11:00／13:30／15:30）は今回は見ない予定。昼ごはんは館内のレストラン（海が見える）で食べるか、博多駅に戻ってから。ショーの時間は変わることがあるので、入館したら館内の案内で確認を。</div>
+  <div class="btns"><a class="btn" data-q="マリンワールド海の中道">📍 地図</a><a class="btn" href="https://marine-world.jp/" target="_blank" rel="noopener">🌐 公式</a><a class="btn" href="https://marine-world.jp/show_schedule/post-8932/" target="_blank" rel="noopener">🐬 ショーの時間（公式）</a><a class="btn cal" data-cal='{"t":"マリンワールド海の中道","s":"2026-11-09T11:30","e":"2026-11-09T13:00","l":"マリンワールド海の中道 福岡市東区西戸崎18-28","d":"11:45 外洋大水槽ショー / 12:20 ペンギンパレード / 12:40 アイランドトーク"}'>📅 カレンダー</a></div></li>
+<li><div class="t">13:12</div><div class="ttl">海ノ中道駅を出発（JR香椎線 香椎行き）</div></li>
+<li><div class="t">13:48</div><div class="ttl">香椎駅で乗り換え（JR鹿児島本線 羽犬塚行き）</div></li>
+<li><div class="t">14:04</div><div class="ttl">博多駅で乗り換え（地下鉄七隈線 橋本行き）</div></li>
+<li><div class="t">14:15<br>〜14:43</div><div class="ttl">Hotel Meiで荷物を受け取る</div></li>
+<li><div class="t">14:43</div><div class="ttl">渡辺通駅を出発（地下鉄七隈線 博多行き）</div></li>
+<li class="key"><div class="t">14:49</div><div class="ttl">博多駅に到着</div><div class="m">ここからはお土産と遅めのお昼（明太子・めんべい・博多通りもん、博多ラーメンなど）。飛行機の都合で、遅くとも16:45には解散。空港へは地下鉄で博多駅から2駅（約5分）。</div>
+  <div class="btns"><a class="btn" data-q="博多駅 マイング">📍 博多駅のお土産売り場</a><a class="btn cal" data-cal='{"t":"博多駅着・お土産","s":"2026-11-09T14:49","e":"2026-11-09T16:45","l":"博多駅","d":"遅くとも16:45に解散"}'>📅 カレンダー</a></div></li>
+</ul>
+</section>
+
+<section id="info">
+<h2>6. 持ち物・注意点</h2>
+<ul>
+<li><strong>現金</strong>（ひらお・屋台で使う。1人1万円くらいあると安心）</li>
+<li>夜用の上着（屋台は屋外）</li>
+<li>小さめのバッグ（屋台用）</li>
+<li>交通系ICカード（地下鉄・西鉄・JRで使える）</li>
+</ul>
+<h3>参考リンク</h3>
+<ul>
+<li><a href="https://www.hirao-foods.net/" target="_blank" rel="noopener">天麩羅処ひらお 公式</a></li>
+<li><a href="https://macaro-ni.jp/120732" target="_blank" rel="noopener">福岡の屋台まとめ（macaroni、2026年9月更新）</a></li>
+<li><a href="https://www.funliday.com/posts/fukuoka-yatai/" target="_blank" rel="noopener">福岡の屋台ガイド（Funliday、2026年4月）</a></li>
+<li><a href="https://www.crossroadfukuoka.jp/feature/yatai" target="_blank" rel="noopener">クロスロードふくおか 屋台特集（福岡県観光）</a></li>
+<li><a href="https://marine-world.jp/" target="_blank" rel="noopener">マリンワールド海の中道 公式</a></li>
+<li><a href="https://straightpress.jp/20250715/1381732" target="_blank" rel="noopener">喫茶ボネ．の紹介（STRAIGHT PRESS、2025年7月）</a></li>
+<li><a href="https://hakata.keizai.biz/headline/3699/" target="_blank" rel="noopener">THE FULL FULL HAKATA 開店記事（博多経済新聞、2021年11月）</a></li>
+</ul>
+</section>
+
+<footer>作成：2026年11月4日（11月6日 友人のプランに合わせて更新）（写真と各スポットの一言を追加）｜写真はGoogleマップのものを直接参照しています。営業時間・定休日・料金は変わることがあります。とくに屋台は日曜・悪天候で休むことがあるので、当日に確認してください。「要確認」は最新情報を確認できなかった項目です。</footer>
+</main>
+<script>
+(function(){
+  var E = encodeURIComponent;
+  var TAG = document.body.getAttribute('data-tag') || '旅のしおり';
+  function gdate(s){ return s.replace(/-/g,'').replace(':','') + '00'; }
+  document.querySelectorAll('[data-cal]').forEach(function(a){
+    try{
+      var c = JSON.parse(a.getAttribute('data-cal'));
+      a.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + E(c.t)
+        + '&dates=' + gdate(c.s) + '/' + gdate(c.e) + '&ctz=Asia/Tokyo'
+        + (c.l ? '&location=' + E(c.l) : '') + '&details=' + E((c.d ? c.d + '\n' : '') + '（' + TAG + '）');
+      a.target = '_blank'; a.rel = 'noopener';
+    }catch(e){ a.classList.add('na'); a.textContent = 'カレンダー情報エラー'; }
+  });
+  document.querySelectorAll('[data-dest]').forEach(function(a){
+    a.href = 'https://www.google.com/maps/dir/?api=1&destination=' + E(a.getAttribute('data-dest')) + '&travelmode=driving';
+    a.target = '_blank'; a.rel = 'noopener';
+  });
+  document.querySelectorAll('[data-q]').forEach(function(a){
+    a.href = 'https://www.google.com/maps/search/?api=1&query=' + E(a.getAttribute('data-q'));
+    a.target = '_blank'; a.rel = 'noopener';
+  });
+  document.querySelectorAll('[data-leg]').forEach(function(a){
+    var p = a.getAttribute('data-leg').split('|');
+    var url = 'https://www.google.com/maps/dir/?api=1&origin=' + E(p[0]) + '&destination=' + E(p[p.length-1]) + '&travelmode=driving';
+    if(p.length > 2){ url += '&waypoints=' + E(p.slice(1,-1).join('|')); }
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+  });
+  function show(g, pl, save){
+    document.querySelectorAll('.plan-panel[data-group="' + g + '"]').forEach(function(x){ x.hidden = x.getAttribute('data-plan') !== pl; });
+    document.querySelectorAll('.ptab[data-group="' + g + '"]').forEach(function(b){ b.setAttribute('aria-selected', b.getAttribute('data-plan') === pl ? 'true' : 'false'); });
+    if(save){ try{ localStorage.setItem('plan_' + g + '_' + location.pathname, pl); }catch(_){} }
+  }
+  var groups = {};
+  document.querySelectorAll('.ptab').forEach(function(b){ groups[b.getAttribute('data-group')] = true; });
+  Object.keys(groups).forEach(function(g){
+    var saved = null; try{ saved = localStorage.getItem('plan_' + g + '_' + location.pathname); }catch(_){}
+    var first = document.querySelector('.ptab[data-group="' + g + '"]');
+    show(g, saved || first.getAttribute('data-plan'), false);
+    document.querySelectorAll('.ptab[data-group="' + g + '"]').forEach(function(b){ b.addEventListener('click', function(){ show(g, b.getAttribute('data-plan'), true); }); });
+  });
+})();
+</script>
+</body>
+</html>
